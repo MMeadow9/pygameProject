@@ -1,0 +1,22 @@
+{
+  "level1": {
+    "music": "data/sounds/sound1.mp3",
+    "icon": "data/images/icon1.png",
+    "background_image": 0,
+    "background_color": [0, 0, 0]
+  },
+
+  "level2": {
+    "music": "data/sounds/sound2.mp3",
+    "icon": "data/images/icon2.png",
+    "background_image": 0,
+    "background_color": [0, 255, 255]
+  },
+
+  "level3": {
+    "music": "data/sounds/sound3.mp3",
+    "icon": "data/images/icon3.png",
+    "background_image": 0,
+    "background_color": [0, 0, 0]
+  }
+}
