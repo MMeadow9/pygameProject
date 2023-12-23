@@ -3,6 +3,7 @@ import pygame
 import json
 from data.widgets.button import *
 from data.widgets.switch import *
+from data.widgets.label import *
 
 
 pygame.init()
