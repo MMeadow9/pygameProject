@@ -5,7 +5,7 @@ pygame.init()
 
 class Petal(pygame.sprite.Sprite):
     def __init__(self, group, color, pos, d="D", rl="RL", ud="DDDU", ws=(700, 500)):
-        super().__init__(*group)
+        super().__init__(group)
 
         size = randint(5, 10)
 
@@ -13,7 +13,7 @@ class Petal(pygame.sprite.Sprite):
 
         self.rotate = randint(-2, 10)
 
-        self.fimage = pygame.surface.Surface((size + 3, size))
+        self.fimage = pygame.surface.Surface((size + 3, size), pygame.SRCALPHA)
 
         pygame.draw.ellipse(self.fimage, color, (0, 0, size, size))
         pygame.draw.polygon(self.fimage, color, [(size // 2, 0), (size // 2, size), (size + 3, size // 2)])

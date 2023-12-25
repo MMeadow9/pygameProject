@@ -14,7 +14,8 @@ class Button:
                  font_name: str | None = None,
                  function=None,
                  fsize: int = 24,
-                 font: pygame.font.Font = None):
+                 font: pygame.font.Font = None,
+                 roading: int = 0):
         """
         Создание кнопки
 
@@ -28,6 +29,7 @@ class Button:
         :param font_name: Название шрифта для текста
         :param function: Функция, вызываемая при нажатии на кнопку
         :param fsize: Размер текста на кнопке
+        :param roading: закругление углов кнопки
         """
 
         self.rect = pygame.rect.Rect(*rect)
@@ -46,6 +48,8 @@ class Button:
         self.fsize = fsize
 
         self.font = font
+
+        self.r = roading
 
     def set_rect(self, rect: tuple[int, int, int, int] | list[int, int, int, int]):
         self.rect = pygame.rect.Rect(*rect)
@@ -85,7 +89,7 @@ class Button:
             self.function()
 
     def draw(self, window: pygame.surface.Surface):
-        pygame.draw.rect(window, self.back_color, self.rect)
+        pygame.draw.rect(window, self.back_color, self.rect, border_radius=self.r)
 
         font = pygame.font.SysFont(self.font_name, self.fsize, self.is_bold, self.is_italic) \
             if not self.font else self.font

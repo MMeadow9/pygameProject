@@ -4,15 +4,6 @@ from random import randint, choice
 pygame.init()
 
 
-window = pygame.display.set_mode((700, 500))
-
-clock = pygame.time.Clock()
-
-FPS = 20
-
-sparks = pygame.sprite.Group()
-
-
 class Spark(pygame.sprite.Sprite):
     def __init__(self, group, pos, ws=(700, 500)):
         super().__init__(group)
@@ -27,11 +18,11 @@ class Spark(pygame.sprite.Sprite):
 
         self.d = "U"
 
-        self.image = pygame.surface.Surface((size, size))
+        self.image = pygame.surface.Surface((size, size), pygame.SRCALPHA)
         self.image.fill(self.color)
 
-        self.dx = randint(4, 10) * choice([1, -1])
-        self.dy = randint(4, 10) * -1
+        self.dx = randint(5, 10) * choice([1, -1])
+        self.dy = randint(8, 10) * -1
 
         self.ws = ws
 
@@ -42,21 +33,15 @@ class Spark(pygame.sprite.Sprite):
             else:
                 self.dy -= 1
                 self.dx += 1 if self.dx < 0 else -1
-        elif self.d == "D":
-            if not self.dx:
-                self.d = choice("RL")
-            else:
-                self.dy += 1
-                self.dx += 1 if self.dx < 0 else -1
         elif self.d == "R":
-            if not self.dy:
-                self.d = choice("D" + "U" * 19)
+            if abs(self.dy) < 5:
+                self.d = choice("U")
             else:
                 self.dx += 1
                 self.dy += 1 if self.dy < 0 else -1
         elif self.d == "L":
-            if not self.dy:
-                self.d = choice("D" + "U" * 19)
+            if abs(self.dy) < 5:
+                self.d = choice("U")
             else:
                 self.dx -= 1
                 self.dy += 1 if self.dy < 0 else -1
@@ -69,25 +54,3 @@ class Spark(pygame.sprite.Sprite):
     def draw(self, window):
         window.blit(self.image, (self.rect.x, self.rect.y))
 
-
-
-BLACK = (0, 0, 0)
-
-while True:
-    window.fill(BLACK)
-
-    for e in pygame.event.get():
-        if e.type == pygame.QUIT:
-            exit()
-
-
-    Spark(sparks, (350, 950))
-    Spark(sparks, (350, 950))
-    Spark(sparks, (350, 950))
-
-    sparks.update()
-    sparks.draw(window)
-
-
-    pygame.display.update()
-    clock.tick(FPS)

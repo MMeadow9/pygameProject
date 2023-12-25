@@ -5,7 +5,7 @@ pygame.init()
 
 
 class Particle(pygame.sprite.Sprite):
-    def __init__(self, group, x, y, color):
+    def __init__(self, group, x, y, color=(255, 255, 255)):
         super().__init__(group)
 
         size = choice([1] * 81 + [2] * 27 + [3] * 9 + [4] * 3 + [5])
@@ -17,6 +17,10 @@ class Particle(pygame.sprite.Sprite):
 
         self.dx, self.dy = randint(-max_speed, max_speed), randint(-max_speed, max_speed)
 
+        self.image = pygame.surface.Surface((size, size))
+
+        self.image.fill(color)
+
     def update(self):
         self.rect = self.rect.move(self.dx, self.dy)
 
@@ -24,4 +28,4 @@ class Particle(pygame.sprite.Sprite):
             self.kill()
 
     def draw(self, window):
-        pygame.draw.rect(window, self.color, self.rect)
+        window.blit(self.image, (self.rect.x, self.rect.y))
