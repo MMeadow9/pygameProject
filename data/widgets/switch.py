@@ -4,19 +4,19 @@ pygame.init()
 
 
 class Switch:
-    def __init__(self, main_rect: pygame.rect.Rect | tuple[int, int, int, int] | list[int, int, int, int],
-                 back_color: pygame.color.Color | tuple[int, int, int] | list[int, int, int],
+    def __init__(self, main_rect: pygame.rect.Rect | tuple[int] | list[int],
+                 back_color: pygame.color.Color | tuple[int] | list[int],
                  text1: str,
                  text2: str,
-                 option_rects: tuple[pygame.rect.Rect, pygame.rect.Rect]
-                               | tuple[tuple[int, int, int, int], tuple[int, int, int, int]]
-                               | tuple[list[int, int, int, int]],
-                 option_color: pygame.color.Color | tuple[int, int, int] | list[int, int, int] = (255, 0, 0),
+                 option_rects: tuple[pygame.rect.Rect, pygame.rect.Rect] | tuple[tuple[int]]
+                               | list[tuple[int]] | list[list[int]]
+                               | tuple[list[int]],
+                 option_color: pygame.color.Color | tuple[int] | list[int] = (255, 0, 0),
                  rounding: int = 5,
                  font_name: str = None,
                  font: pygame.font.Font = None,
                  fsize: int = 20,
-                 second_option_color: pygame.color.Color | tuple[int, int, int] | list[int, int, int] = None):
+                 second_option_color: pygame.color.Color | tuple[int] | list[int] = None):
 
         self.main_rect = main_rect if type(main_rect) not in (tuple, list) else pygame.rect.Rect(*main_rect)
         self.back_color = back_color
@@ -78,3 +78,7 @@ class Switch:
                         self.option_rects[1].centerx - image2.get_width() // 2,
                         self.option_rects[1].centery - image2.get_height() // 2
                     ))
+
+    def set_text(self, text1: str, text2: str):
+        self.text1 = text1
+        self.text2 = text2

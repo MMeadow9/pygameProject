@@ -4,10 +4,10 @@ pygame.init()
 
 
 class Button:
-    def __init__(self, rect: tuple[int, int, int, int] | list[int, int, int, int],
+    def __init__(self, rect: tuple[int] | list[int],
                  text: str,
-                 back_color: pygame.Color | tuple[int, int, int] | list[int, int, int] = (255, 255, 255),
-                 text_color: pygame.Color | tuple[int, int, int] | list[int, int, int] = (0, 0, 0),
+                 back_color: pygame.Color | tuple[int] | list[int] = (255, 255, 255),
+                 text_color: pygame.Color | tuple[int] | list[int] = (0, 0, 0),
                  is_antialias: bool | int = True,
                  is_bold: bool | int = False,
                  is_italic: bool | int = False,
@@ -15,7 +15,7 @@ class Button:
                  function=None,
                  fsize: int = 24,
                  font: pygame.font.Font = None,
-                 roading: int = 0):
+                 rounding: int = 0):
         """
         Создание кнопки
 
@@ -29,7 +29,7 @@ class Button:
         :param font_name: Название шрифта для текста
         :param function: Функция, вызываемая при нажатии на кнопку
         :param fsize: Размер текста на кнопке
-        :param roading: закругление углов кнопки
+        :param rounding: закругление углов кнопки
         """
 
         self.rect = pygame.rect.Rect(*rect)
@@ -49,7 +49,7 @@ class Button:
 
         self.font = font
 
-        self.r = roading
+        self.r = rounding
 
     def set_rect(self, rect: tuple[int, int, int, int] | list[int, int, int, int]):
         self.rect = pygame.rect.Rect(*rect)
