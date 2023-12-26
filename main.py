@@ -23,6 +23,13 @@ clock = pygame.time.Clock()
 FPS = 40
 
 
+def customize_sizes(size1: tuple[int] | list[int], size2: tuple[int] | list[int]) -> tuple[int]:
+    x1, y1 = size1
+    x2, y2 = size2
+    z = min([x1 / x2, y1 / y2])
+    return (int(x2 * z), int(y2 * z))
+
+
 class MainGame:
     def __init__(self, window: pygame.surface.Surface):
         self.w = window
@@ -148,6 +155,10 @@ class MainGame:
                              rounding=14,
                              function=self.to_menu)
 
+        level_icon_path = levels_json[f"level{self.levelID + 1}"]["icon"]
+        level_icon = pygame.image.load(level_icon_path)
+        level_icon = pygame.transform.scale(level_icon,
+                                            customize_sizes((400, 250), (level_icon.get_size())))
 
         while True:
             self.w.fill((0, 0, 0))
@@ -159,14 +170,18 @@ class MainGame:
 
             [button.draw(self.w) for button in [button_prev, button_next, button_menu]]
 
+            self.w.blit(level_icon, (350 - level_icon.get_width() // 2, 140 - level_icon.get_height() // 2))
+
             pygame.display.update()
             clock.tick(FPS)
 
     def minus_id_level(self):
         self.levelID = max([0, min([self.levelID - 1, len(levels_json) - 1])])
+        self.to_select_level()
 
     def plus_id_level(self):
         self.levelID = max([0, min([self.levelID + 1, len(levels_json) - 1])])
+        self.to_select_level()
 
 
 MainGame(window)
