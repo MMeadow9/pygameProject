@@ -7,6 +7,7 @@ text = [
     "None"
 ]
 
+
 class GuideEn(QWidget):
     def __init__(self):
         super().__init__()

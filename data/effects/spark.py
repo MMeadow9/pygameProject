@@ -53,4 +53,3 @@ class Spark(pygame.sprite.Sprite):
 
     def draw(self, window):
         window.blit(self.image, (self.rect.x, self.rect.y))
-

@@ -3,6 +3,7 @@ from random import randint, choice
 
 pygame.init()
 
+
 class Petal(pygame.sprite.Sprite):
     def __init__(self, group, color, pos, d="D", rl="RL", ud="DDDU", ws=(700, 500)):
         super().__init__(group)
@@ -72,4 +73,3 @@ class Petal(pygame.sprite.Sprite):
 
     def draw(self, window):
         window.blit(self.image, (self.rect.x, self.rect.y))
-

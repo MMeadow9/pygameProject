@@ -105,4 +105,3 @@ class Button:
                 self.rect.centery - rect_text_image.height // 2
             )
         )
-

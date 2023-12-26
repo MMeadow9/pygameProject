@@ -131,4 +131,5 @@ class MainGame:
         guide.show()
         app.exec()
 
+
 MainGame(window)

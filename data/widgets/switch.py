@@ -8,16 +8,14 @@ class Switch:
                  back_color: pygame.color.Color | tuple[int] | list[int],
                  text1: str,
                  text2: str,
-                 option_rects: tuple[pygame.rect.Rect, pygame.rect.Rect] | tuple[tuple[int]]
-                               | list[tuple[int]] | list[list[int]]
-                               | tuple[list[int]],
+                 option_rects: tuple[pygame.rect.Rect,
+                 pygame.rect.Rect] | tuple[tuple[int]] | list[tuple[int]] | list[list[int]] | tuple[list[int]],
                  option_color: pygame.color.Color | tuple[int] | list[int] = (255, 0, 0),
                  rounding: int = 5,
                  font_name: str = None,
                  font: pygame.font.Font = None,
                  fsize: int = 20,
                  second_option_color: pygame.color.Color | tuple[int] | list[int] = None):
-
         self.main_rect = main_rect if type(main_rect) not in (tuple, list) else pygame.rect.Rect(*main_rect)
         self.back_color = back_color
 
