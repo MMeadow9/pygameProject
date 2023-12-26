@@ -8,6 +8,11 @@
     "figures": {
       "rects": [],
       "ellipses": []
+    },
+    "data": {
+      "name": "Some Point of No Return",
+      "link": "https://youtu.be/ht-eTQW-p0w?si=rYd2kN3dAhIXyCjZ",
+      "duration": 67
     }
   },
 
@@ -20,6 +25,11 @@
     "figures": {
       "rects": [],
       "ellipses": []
+    },
+    "data": {
+      "name": "Young Girl A",
+      "link": "https://youtu.be/AqI97zHMoQw?si=06caMTRk3uDtCANt",
+      "duration": 166
     }
   },
 
@@ -51,5 +61,10 @@
 
       "ellipses": []
     }
-  }
+  },
+  "data": {
+      "name": "Airbone Robots",
+      "link": "https://youtu.be/tkY1vTeVBUA?si=EQYSgfacv4Qr-U_U",
+      "duration": 273
+    }
 }
