@@ -7,6 +7,8 @@ from data.widgets.label import *
 from data.effects.petal import *
 from data.effects.spark import *
 from data.effects.particle import *
+from data.documentation.guide.guide_en import *
+from data.documentation.guide.guide_ru import *
 
 
 pygame.init()
@@ -15,7 +17,6 @@ with open("data/levels.json") as file_json:
     levels_json = json.load(file_json)
 
 window = pygame.display.set_mode((700, 500))
-
 
 clock = pygame.time.Clock()
 
@@ -50,8 +51,7 @@ class MainGame:
 
         button_guide = Button((20, 20, 280, 80),
                               {0: "Гайд", 1: "Guide"}[self.language],
-                              fsize=75, rounding=6, is_italic=True,
-                              back_color=[153] * 3)
+                              fsize=75, rounding=6, is_italic=True, function=self.guide)
 
         while True:
             self.all_sprites = pygame.sprite.Group()
@@ -61,6 +61,7 @@ class MainGame:
                 if e.type == pygame.QUIT:
                     exit()
                 if e.type == pygame.MOUSEBUTTONDOWN:
+                    button_guide.check_click(e.pos)
                     button_settings.check_click(e.pos)
             button_play.draw(self.w)
             button_settings.draw(self.w)
@@ -80,16 +81,18 @@ class MainGame:
             [375, 50, 275, 100]
         ], rounding=30, option_color=(0, 255, 0), second_option_color=(255, 0, 0), fsize={0: 37, 1: 58}[self.language])
 
+        switch_mode.selected = self.mode
+
         switch_lang = Switch((25, 200, 650, 150), [153] * 3, "Русский", "English", [
             [50, 225, 275, 100],
             [375, 225, 275, 100]
         ], rounding=30, option_color=(0, 255, 0), second_option_color=(255, 0, 0), fsize=75)
 
+        switch_lang.selected = self.language
+
         button_menu = Button((25, 380, 650, 70),
                              {0: "В Меню", 1: "To Menu"}[self.language],
                              fsize=62, rounding=10, function=self.to_menu)
-
-
 
         while True:
             switch_mode.set_text({0: "Нормальный Режим", 1: "Normal Mode"}[self.language],
@@ -118,5 +121,14 @@ class MainGame:
 
             pygame.display.update()
             clock.tick(FPS)
+
+    def guide(self):
+        app = QApplication([])
+        if self.language:
+            guide = GuideEn()
+        else:
+            guide = GuideRu()
+        guide.show()
+        app.exec()
 
 MainGame(window)
