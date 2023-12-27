@@ -9,6 +9,7 @@ from data.effects.spark import *
 from data.effects.particle import *
 from data.documentation.guide.guide_en import *
 from data.documentation.guide.guide_ru import *
+import webbrowser
 
 
 pygame.init()
@@ -155,10 +156,20 @@ class MainGame:
                              rounding=14,
                              function=self.to_menu)
 
+        button_copy = Button([235, 315, 230, 40], {0: "Открыть URL", 1: "Open URL"}[self.language],
+                             fsize={0: 38, 1: 40}[self.language],
+                             function=self.open_level_url,
+                             rounding=8)
+
         level_icon_path = levels_json[f"level{self.levelID + 1}"]["icon"]
         level_icon = pygame.image.load(level_icon_path)
         level_icon = pygame.transform.scale(level_icon,
-                                            customize_sizes((400, 250), (level_icon.get_size())))
+                                            customize_sizes((600, 200), (level_icon.get_size())))
+
+        label_name = Label((350, 280),
+                           levels_json[f"level{self.levelID + 1}"]["data"]["name"][str(self.language)],
+                           text_color=(255, 255, 255),
+                           fsize={0: 40, 1: 30}[self.language])
 
         while True:
             self.w.fill((0, 0, 0))
@@ -166,11 +177,16 @@ class MainGame:
                 if e.type == pygame.QUIT:
                     exit()
                 if e.type == pygame.MOUSEBUTTONDOWN:
-                    [button.check_click(e.pos) for button in [button_prev, button_next, button_menu]]
+                    [button.check_click(e.pos) for button in [button_prev, button_next, button_menu, button_copy]]
+                if e.type == pygame.KEYDOWN:
+                    if e.key == pygame.K_LEFT:
+                        self.minus_id_level()
+                    if e.key == pygame.K_RIGHT:
+                        self.plus_id_level()
 
-            [button.draw(self.w) for button in [button_prev, button_next, button_menu]]
+            [widget.draw(self.w) for widget in [button_prev, button_next, button_menu, label_name, button_copy]]
 
-            self.w.blit(level_icon, (350 - level_icon.get_width() // 2, 140 - level_icon.get_height() // 2))
+            self.w.blit(level_icon, (350 - level_icon.get_width() // 2, 105 - level_icon.get_height() // 2))
 
             pygame.display.update()
             clock.tick(FPS)
@@ -182,6 +198,9 @@ class MainGame:
     def plus_id_level(self):
         self.levelID = max([0, min([self.levelID + 1, len(levels_json) - 1])])
         self.to_select_level()
+
+    def open_level_url(self):
+        webbrowser.open(levels_json[f"level{self.levelID + 1}"]["data"]["link"])
 
 
 MainGame(window)

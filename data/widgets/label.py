@@ -11,7 +11,7 @@ class Label:
                  font: pygame.font.Font = None,
                  fsize: int = 24):
         self.center = center
-        self.text = [text] if isinstance(text, str) else text
+        self.text = text
         self.text_color = text_color
         self.font_name = font_name
         self.font = font

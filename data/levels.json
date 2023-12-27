@@ -10,7 +10,10 @@
       "ellipses": []
     },
     "data": {
-      "name": "Some Point of No Return",
+      "name": {
+        "1": "Some Point of No Return",
+        "0": "Точка Невозврата"
+      },
       "link": "https://youtu.be/ht-eTQW-p0w?si=rYd2kN3dAhIXyCjZ",
       "duration": 67
     }
@@ -27,7 +30,10 @@
       "ellipses": []
     },
     "data": {
-      "name": "Young Girl A",
+      "name": {
+        "1": "Young Girl A",
+        "0": "Молодая Девушка А"
+      },
       "link": "https://youtu.be/AqI97zHMoQw?si=06caMTRk3uDtCANt",
       "duration": 166
     }
@@ -62,7 +68,10 @@
       "ellipses": []
     },
     "data": {
-      "name": "Airbone Robots",
+      "name": {
+        "1": "Airborne Robots",
+        "0": "Летающие Роботы"
+      },
       "link": "https://youtu.be/tkY1vTeVBUA?si=EQYSgfacv4Qr-U_U",
       "duration": 273
     }
