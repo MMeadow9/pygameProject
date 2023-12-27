@@ -49,7 +49,7 @@ class MainGame:
 
         button_play = Button((230, 280, 240, 100),
                              {0: "Играть", 1: "Play"}[self.language],
-                             is_bold=True, fsize=90, rounding=7, function=self.to_select_level)
+                             is_bold=True, is_italic=True, fsize=90, rounding=7, function=self.to_select_level)
 
         button_settings = Button((400, 20, 280, 80),
                                  {0: "Настройки", 1: "Settings"}[self.language],
@@ -138,38 +138,59 @@ class MainGame:
         app.exec()
 
     def to_select_level(self):
-        button_prev = Button([25, 380, 200, 60],
+        button_prev = Button([25, 380, 310, 90],
                              {0: "Предыдущий Уровень", 1: "Previous Level"}[self.language],
-                             fsize={0: 23, 1: 31}[self.language],
+                             fsize={0: 33, 1: 49}[self.language],
                              function=self.minus_id_level,
-                             rounding=12
+                             rounding=17,
+                             is_italic=True
                              )
-        button_next = Button([475, 380, 200, 60],
+        button_next = Button([365, 380, 310, 90],
                              {0: "Следующий Уровень", 1: "Next Level"}[self.language],
-                             fsize={0: 26, 1: 41}[self.language],
+                             fsize={0: 36, 1: 57}[self.language],
                              function=self.plus_id_level,
-                             rounding=12
+                             rounding=17,
+                             is_italic=True
                              )
-        button_menu = Button([250, 375, 200, 70],
+        button_menu = Button([25, 255, 220, 95],
                              {0: "В Меню", 1: "To Menu"}[self.language],
-                             fsize=60,
-                             rounding=14,
-                             function=self.to_menu)
+                             fsize=67,
+                             rounding=16,
+                             function=self.to_menu,
+                             is_italic=True)
 
-        button_copy = Button([235, 315, 230, 40], {0: "Открыть URL", 1: "Open URL"}[self.language],
-                             fsize={0: 38, 1: 40}[self.language],
+        button_open = Button([270, 265, 405, 75], {0: "Открыть URL в Браузере", 1: "Open URL in Browser"}[self.language],
+                             fsize={0: 40, 1: 45}[self.language],
                              function=self.open_level_url,
-                             rounding=8)
+                             rounding=8,
+                             is_italic=True)
 
-        level_icon_path = levels_json[f"level{self.levelID + 1}"]["icon"]
-        level_icon = pygame.image.load(level_icon_path)
-        level_icon = pygame.transform.scale(level_icon,
-                                            customize_sizes((600, 200), (level_icon.get_size())))
+        button_play = Button([350, 160, 310, 46],
+                             {0: "Играть", 1: "Play"}[self.language],
+                             fsize={0: 40, 1: 44}[self.language],
+                             back_color=(153, 153, 153),
+                             rounding=9,
+                             is_italic=True)
 
-        label_name = Label((350, 280),
+        image_star = pygame.transform.scale(pygame.image.load("data/images/star.png"), (40, 40))
+
+        image_level_path = levels_json[f"level{self.levelID + 1}"]["icon"]
+        image_level = pygame.image.load(image_level_path)
+        image_level = pygame.transform.scale(image_level,
+                                            customize_sizes((300, 200), (image_level.get_size())))
+
+        label_name = Label((505, 40),
                            levels_json[f"level{self.levelID + 1}"]["data"]["name"][str(self.language)],
                            text_color=(255, 255, 255),
-                           fsize={0: 40, 1: 30}[self.language])
+                           fsize={0: 50, 1: 41}[self.language])
+
+        label_duration = Label((505, 90),
+                {0: f"Продолжительность: {levels_json['level' + str(self.levelID + 1)]['data']['duration']} сек.",
+                 1: f"Duration: {levels_json['level' + str(self.levelID + 1)]['data']['duration']} sec."}[self.language],
+                               (255, 255, 255),
+                               fsize=31)
+
+        complexity = levels_json[f"level{self.levelID + 1}"]["complexity"]
 
         while True:
             self.w.fill((0, 0, 0))
@@ -177,16 +198,23 @@ class MainGame:
                 if e.type == pygame.QUIT:
                     exit()
                 if e.type == pygame.MOUSEBUTTONDOWN:
-                    [button.check_click(e.pos) for button in [button_prev, button_next, button_menu, button_copy]]
+                    [button.check_click(e.pos) for button in [button_prev, button_next, button_menu, button_open]]
                 if e.type == pygame.KEYDOWN:
                     if e.key == pygame.K_LEFT:
                         self.minus_id_level()
                     if e.key == pygame.K_RIGHT:
                         self.plus_id_level()
 
-            [widget.draw(self.w) for widget in [button_prev, button_next, button_menu, label_name, button_copy]]
+            [widget.draw(self.w) for widget in [button_prev, button_next, button_menu, button_open, button_play,
+                                                label_name, label_duration]]
 
-            self.w.blit(level_icon, (350 - level_icon.get_width() // 2, 105 - level_icon.get_height() // 2))
+            self.w.blit(image_level, (155 - image_level.get_width() // 2, 110 - image_level.get_height() // 2))
+
+            x1 = 490 - (35 * (complexity - 1))
+
+            for _ in range(complexity):
+                self.w.blit(image_star, (x1, 105))
+                x1 += 65
 
             pygame.display.update()
             clock.tick(FPS)
