@@ -38,6 +38,10 @@ class Button:
         self.back_color = back_color
         self.text_color = text_color
 
+        self.color = back_color
+
+        self.back_color_dark = tuple(map(lambda x: (x / 10 * 7), back_color))
+
         self.is_antialias = is_antialias
         self.is_bold = is_bold
         self.is_italic = is_italic
@@ -61,6 +65,7 @@ class Button:
                    text_color: pygame.Color | tuple[int, int, int] | list[int, int, int] = None):
         self.back_color = back_color if back_color is not None else self.back_color
         self.text_color = text_color if text_color is not None else self.text_color
+        self.back_color_dark = tuple(map(lambda x: (x / 10 * 7), back_color))
 
     def set_text_characteristic(self, is_antialias: bool | int = None,
                                 is_bold: bool | int = None,
@@ -89,7 +94,7 @@ class Button:
             self.function()
 
     def draw(self, window: pygame.surface.Surface):
-        pygame.draw.rect(window, self.back_color, self.rect, border_radius=self.r)
+        pygame.draw.rect(window, self.color, self.rect, border_radius=self.r)
 
         font = pygame.font.SysFont(self.font_name, self.fsize, self.is_bold, self.is_italic) \
             if not self.font else self.font
@@ -105,3 +110,9 @@ class Button:
                 self.rect.centery - rect_text_image.height // 2
             )
         )
+
+    def check_on(self, pos: tuple[int] | list[int]):
+        if self.collide_point(pos):
+            self.color = self.back_color_dark
+        else:
+            self.color = self.back_color

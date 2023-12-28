@@ -35,6 +35,8 @@ class MainGame:
     def __init__(self, window: pygame.surface.Surface):
         self.w = window
 
+        self.x, self.y = -1, -1
+
         self.levelID = 0
         self.mode = 0
         self.language = 0
@@ -46,7 +48,6 @@ class MainGame:
         self.to_menu()
 
     def to_menu(self):
-
         button_play = Button((230, 280, 240, 100),
                              {0: "Играть", 1: "Play"}[self.language],
                              is_bold=True, is_italic=True, fsize=90, rounding=7, function=self.to_select_level)
@@ -70,6 +71,11 @@ class MainGame:
                 if e.type == pygame.MOUSEBUTTONDOWN:
                     [button.check_click(e.pos)
                         for button in [button_play, button_settings, button_guide]]
+                if e.type == pygame.MOUSEMOTION:
+                    self.x, self.y = e.pos
+
+            [button.check_on((self.x, self.y)) for button in [button_play, button_settings, button_guide]]
+
             [button.draw(self.w)
                 for button in [button_play, button_settings, button_guide]]
 
@@ -116,6 +122,11 @@ class MainGame:
                     switch_mode.check_click(e.pos)
                     switch_lang.check_click(e.pos)
                     button_menu.check_click(e.pos)
+                if e.type == pygame.MOUSEMOTION:
+                    self.x, self.y = e.pos
+
+            button_menu.check_on((self.x, self.y))
+
 
             self.language = switch_lang.get_selected()
             self.mode = switch_mode.get_selected()
@@ -170,7 +181,8 @@ class MainGame:
                              fsize={0: 40, 1: 44}[self.language],
                              back_color=(153, 153, 153),
                              rounding=9,
-                             is_italic=True)
+                             is_italic=True,
+                             function=self.play)
 
         image_star = pygame.transform.scale(pygame.image.load("data/images/star.png"), (40, 40))
 
@@ -204,6 +216,11 @@ class MainGame:
                         self.minus_id_level()
                     if e.key == pygame.K_RIGHT:
                         self.plus_id_level()
+                if e.type == pygame.MOUSEMOTION:
+                    self.x, self.y = e.pos
+
+            [button.check_on((self.x, self.y)) for button in [button_play, button_open, button_menu, button_next,
+                                                              button_prev]]
 
             [widget.draw(self.w) for widget in [button_prev, button_next, button_menu, button_open, button_play,
                                                 label_name, label_duration]]
@@ -229,6 +246,31 @@ class MainGame:
 
     def open_level_url(self):
         webbrowser.open(levels_json[f"level{self.levelID + 1}"]["data"]["link"])
+
+    def play(self):
+        level = levels_json[f"level{self.levelID + 1}"]
+        in_menu = False
+
+
+
+
+        while True:
+            self.w.fill((0, 0, 0))
+            for e in pygame.event.get():
+                if e.type == pygame.QUIT:
+                    exit()
+
+            pygame.display.update()
+            clock.tick(FPS)
+
+    def fill(self, color: tuple[int, int, int] | list[int, int, int], alpha: int = 255):
+        s = pygame.Surface((700, 500))
+        s.fill(color)
+        s.set_alpha(alpha)
+
+        self.w.blit(s, (0, 0))
+
+
 
 
 MainGame(window)
