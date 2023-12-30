@@ -210,7 +210,8 @@ class MainGame:
                 if e.type == pygame.QUIT:
                     exit()
                 if e.type == pygame.MOUSEBUTTONDOWN:
-                    [button.check_click(e.pos) for button in [button_prev, button_next, button_menu, button_open]]
+                    [button.check_click(e.pos) for button in [button_prev, button_next, button_menu, button_open,
+                                                              button_play]]
                 if e.type == pygame.KEYDOWN:
                     if e.key == pygame.K_LEFT:
                         self.minus_id_level()
@@ -251,14 +252,43 @@ class MainGame:
         level = levels_json[f"level{self.levelID + 1}"]
         in_menu = False
 
+        music = level["music"]
+        icon = level["icon"]
+        back_image = level["background_image"]
+        back_color = level["background_color"]
 
+        rects = level["figures"]["rects"]
+        ellipses = level["figures"]["ellipses"]
 
+        iters_of_game = 0
+
+        comp = level["complexity"]
+
+        button_pause = Button((655, 15, 30, 30), "", None, image="data/images/pause.png",
+                              function=self.fill_alpha)
+
+        on_menu = False
 
         while True:
-            self.w.fill((0, 0, 0))
+            self.w.fill(back_color)
+
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
                     exit()
+                if e.type == pygame.MOUSEBUTTONDOWN:
+                    if button_pause.collide_point(e.pos):
+                        on_menu = True
+
+            self.w.blit(
+                pygame.transform.scale(pygame.image.load(back_image), (700, 500))
+                (0, 0)) if back_image else 0
+
+            button_pause.draw(self.w)
+
+            if on_menu:
+                self.fill_alpha()
+            else:
+                pass
 
             pygame.display.update()
             clock.tick(FPS)
@@ -269,6 +299,9 @@ class MainGame:
         s.set_alpha(alpha)
 
         self.w.blit(s, (0, 0))
+
+    def fill_alpha(self, color: tuple[int, int, int] = (0, 0, 0)):
+        self.fill(color, 128)
 
 
 

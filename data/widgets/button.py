@@ -6,7 +6,7 @@ pygame.init()
 class Button:
     def __init__(self, rect: tuple[int] | list[int],
                  text: str,
-                 back_color: pygame.Color | tuple[int] | list[int] = (255, 255, 255),
+                 back_color: pygame.Color | tuple[int] | list[int] | None = (255, 255, 255),
                  text_color: pygame.Color | tuple[int] | list[int] = (0, 0, 0),
                  is_antialias: bool | int = True,
                  is_bold: bool | int = False,
@@ -15,7 +15,8 @@ class Button:
                  function=None,
                  fsize: int = 24,
                  font: pygame.font.Font = None,
-                 rounding: int = 0):
+                 rounding: int = 0,
+                 image: str = ""):
         """
         Создание кнопки
 
@@ -29,7 +30,8 @@ class Button:
         :param font_name: Название шрифта для текста
         :param function: Функция, вызываемая при нажатии на кнопку
         :param fsize: Размер текста на кнопке
-        :param rounding: закругление углов кнопки
+        :param rounding: Закругление углов кнопки
+        :param image: Путь к картинке, на кнопке
         """
 
         self.rect = pygame.rect.Rect(*rect)
@@ -40,7 +42,7 @@ class Button:
 
         self.color = back_color
 
-        self.back_color_dark = tuple(map(lambda x: (x / 10 * 7), back_color))
+        self.back_color_dark = tuple(map(lambda x: (x / 10 * 7), back_color)) if back_color else 0
 
         self.is_antialias = is_antialias
         self.is_bold = is_bold
@@ -55,8 +57,13 @@ class Button:
 
         self.r = rounding
 
+        self.image = image
+
+        self.pos = self.rect.x, self.rect.y
+
     def set_rect(self, rect: tuple[int, int, int, int] | list[int, int, int, int]):
         self.rect = pygame.rect.Rect(*rect)
+        self.pos = self.rect.x, self.rect.y
 
     def set_text(self, text: str):
         self.text = text
@@ -94,7 +101,7 @@ class Button:
             self.function()
 
     def draw(self, window: pygame.surface.Surface):
-        pygame.draw.rect(window, self.color, self.rect, border_radius=self.r)
+        pygame.draw.rect(window, self.color, self.rect, border_radius=self.r) if self.color else 0
 
         font = pygame.font.SysFont(self.font_name, self.fsize, self.is_bold, self.is_italic) \
             if not self.font else self.font
@@ -111,8 +118,15 @@ class Button:
             )
         )
 
+        window.blit(pygame.transform.scale(pygame.image.load(self.image), self.rect.size),
+                    self.pos) if self.image else 0
+
+
     def check_on(self, pos: tuple[int] | list[int]):
         if self.collide_point(pos):
             self.color = self.back_color_dark
         else:
             self.color = self.back_color
+
+    def clicked(self, function):
+        self.function = function
