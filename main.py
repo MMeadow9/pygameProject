@@ -1,4 +1,4 @@
-from random import randint, choice
+from random import randint, choice, choices
 import pygame
 import json
 from data.widgets.button import *
@@ -43,11 +43,21 @@ class MainGame:
 
         self.rect_alpha = 0
 
+        self.music = 1
+
+        self.music_is_already_played = 0
+
         self.all_sprites = pygame.sprite.Group()
 
         self.to_menu()
 
     def to_menu(self):
+        if not self.music_is_already_played:
+            pygame.mixer.music.load("data/sounds/back_music.mp3")
+            pygame.mixer.music.play(-1)
+
+            self.music_is_already_played = 1
+
         button_play = Button((230, 280, 240, 100),
                              {0: "Играть", 1: "Play"}[self.language],
                              is_bold=True, is_italic=True, fsize=90, rounding=7, function=self.to_select_level)
@@ -83,6 +93,12 @@ class MainGame:
             clock.tick(FPS)
 
     def to_settings(self):
+        if not self.music_is_already_played:
+            pygame.mixer.music.load("data/sounds/back_music.mp3")
+            pygame.mixer.music.play(-1)
+
+            self.music_is_already_played = 1
+
         self.all_sprites = pygame.sprite.Group()
 
         switch_mode = Switch((25, 25, 650, 150), [153] * 3,
@@ -149,6 +165,12 @@ class MainGame:
         app.exec()
 
     def to_select_level(self):
+        if not self.music_is_already_played:
+            pygame.mixer.music.load("data/sounds/back_music.mp3")
+            pygame.mixer.music.play(-1)
+
+            self.music_is_already_played = 1
+
         button_prev = Button([25, 380, 310, 90],
                              {0: "Предыдущий Уровень", 1: "Previous Level"}[self.language],
                              fsize={0: 33, 1: 49}[self.language],
@@ -179,10 +201,11 @@ class MainGame:
         button_play = Button([350, 160, 310, 46],
                              {0: "Играть", 1: "Play"}[self.language],
                              fsize={0: 40, 1: 44}[self.language],
-                             back_color=(153, 153, 153),
                              rounding=9,
                              is_italic=True,
                              function=self.play)
+
+
 
         image_star = pygame.transform.scale(pygame.image.load("data/images/star.png"), (40, 40))
 
@@ -249,6 +272,8 @@ class MainGame:
         webbrowser.open(levels_json[f"level{self.levelID + 1}"]["data"]["link"])
 
     def play(self):
+        self.music_is_already_played = 0
+
         level = levels_json[f"level{self.levelID + 1}"]
         in_menu = False
 
@@ -264,10 +289,30 @@ class MainGame:
 
         comp = level["complexity"]
 
+        spawns = level["spawn_notes"]
+
+        if self.mode:
+            spawns = 0
+
+
         button_pause = Button((655, 15, 30, 30), "", None, image="data/images/pause.png",
                               function=self.fill_alpha)
 
+        button_quit_menu = Button((250, 300, 200, 60), {0: "Продолжить", 1: "Continue"}[self.language],
+                                  is_italic=True, fsize={0: 40, 1: 50}[self.language], rounding=12)
+
+        button_play_again = Button((255, 200, 190, 60), {0: "Заново", 1: "Play Again"}[self.language],
+                                   is_italic=True, fsize=50, rounding=12, function=self.play)
+
+        button_quit_level = Button((260, 100, 180, 60), {0: "Выйти", 1: "Exit"}[self.language],
+                                   is_italic=True, fsize=60, rounding=12, function=self.to_select_level)
+
+
+
         on_menu = False
+
+        pygame.mixer.music.load(level["music"])
+        pygame.mixer.music.play(1)
 
         while True:
             self.w.fill(back_color)
@@ -279,6 +324,15 @@ class MainGame:
                     if button_pause.collide_point(e.pos):
                         on_menu = True
 
+
+                    if on_menu:
+                        button_quit_level.check_click(e.pos)
+
+                        if button_quit_menu.collide_point(e.pos):
+                            on_menu = False
+                    else:
+                        pass
+
             self.w.blit(
                 pygame.transform.scale(pygame.image.load(back_image), (700, 500))
                 (0, 0)) if back_image else 0
@@ -287,9 +341,14 @@ class MainGame:
 
             if on_menu:
                 self.fill_alpha()
+                pygame.mixer.music.pause()
+                [button.draw(self.w) for button in [button_quit_level, button_quit_menu, button_play_again]]
             else:
-                pass
+                iters_of_game += 1
 
+
+
+                pygame.mixer.music.unpause()
             pygame.display.update()
             clock.tick(FPS)
 
