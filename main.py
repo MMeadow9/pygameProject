@@ -1,14 +1,19 @@
 from random import randint, choice, choices
 import pygame
 import json
+
 from data.widgets.button import *
 from data.widgets.switch import *
 from data.widgets.label import *
+from data.widgets.big_switch import *
+
 from data.effects.petal import *
 from data.effects.spark import *
 from data.effects.particle import *
+
 from data.documentation.guide.guide_en import *
 from data.documentation.guide.guide_ru import *
+
 import webbrowser
 
 
@@ -48,6 +53,8 @@ class MainGame:
         self.music_is_already_played = 0
 
         self.all_sprites = pygame.sprite.Group()
+
+        self.volume = 5
 
         self.to_menu()
 
@@ -101,34 +108,57 @@ class MainGame:
 
         self.all_sprites = pygame.sprite.Group()
 
-        switch_mode = Switch((25, 25, 650, 150), [153] * 3,
+        switch_volume = BigSwitch(
+            (25, 30, 650, 100), [153] * 3,
+            [{0: "Выкл.", 1: "OFF"}[self.language]] + list("12345"),
+            [
+                [35, 40, 140, 80], [175 + 28, 40, 70, 80], [245 + 28 * 2, 40, 70, 80], [315 + 28 * 3, 40, 70, 80],
+                [385 + 28 * 4, 40, 70, 80], [455 + 28 * 5, 40, 70, 80]
+            ],
+            [
+                (255, 0, 0), (255, 128, 0), (255, 255, 0), (128, 255, 0), (0, 255, 0), (0, 255, 128)
+            ],
+            rounding=25,
+            fsize=48
+        )
+        switch_volume.selected = self.volume
+
+        switch_mode = Switch((25, 155, 650, 100), [153] * 3,
                              {0: "Нормальный Режим", 1: "Normal Mode"}[self.language],
                              {0: "Сложный Режим", 1: "Hard Mode"}[self.language],
                              [
-            [50, 50, 275, 100],
-            [375, 50, 275, 100]
-        ], rounding=30, option_color=(0, 255, 0), second_option_color=(255, 0, 0), fsize={0: 37, 1: 58}[self.language])
+                                 [50, 165, 275, 80],
+                                 [375, 165, 275, 80]
+                             ], rounding=30, option_color=(0, 255, 0), second_option_color=(255, 0, 0),
+                             fsize={0: 37, 1: 58}[self.language])
 
         switch_mode.selected = self.mode
 
-        switch_lang = Switch((25, 200, 650, 150), [153] * 3, "Русский", "English", [
-            [50, 225, 275, 100],
-            [375, 225, 275, 100]
+        switch_lang = Switch((25, 280, 650, 100), [153] * 3, "Русский", "English", [
+            [50, 290, 275, 80],
+            [375, 290, 275, 80]
         ], rounding=30, option_color=(0, 255, 0), second_option_color=(255, 0, 0), fsize=75)
 
         switch_lang.selected = self.language
 
-        button_menu = Button((25, 380, 650, 70),
+        button_menu = Button((25, 405, 650, 70),
                              {0: "В Меню", 1: "To Menu"}[self.language],
                              fsize=62, rounding=10, function=self.to_menu)
 
         while True:
+            pygame.mixer.music.set_volume(self.volume * 0.2)
+
+            self.volume = int(switch_volume.get_selected())
+
             switch_mode.set_text({0: "Нормальный Режим", 1: "Normal Mode"}[self.language],
                                  {0: "Сложный Режим", 1: "Hard Mode"}[self.language])
 
             switch_mode.fsize = {0: 38, 1: 58}[self.language]
 
             button_menu.set_text({0: "В Меню", 1: "To Menu"}[self.language])
+
+            switch_volume.texts[0] = {0: "Выкл.", 1: "OFF"}[self.language]
+            switch_volume.fsize = {0: 48, 1: 56}[self.language]
 
             self.w.fill((0, 0, 0))
             for e in pygame.event.get():
@@ -138,6 +168,7 @@ class MainGame:
                     switch_mode.check_click(e.pos)
                     switch_lang.check_click(e.pos)
                     button_menu.check_click(e.pos)
+                    switch_volume.check_click(e.pos)
                 if e.type == pygame.MOUSEMOTION:
                     self.x, self.y = e.pos
 
@@ -147,6 +178,7 @@ class MainGame:
             self.language = switch_lang.get_selected()
             self.mode = switch_mode.get_selected()
 
+            switch_volume.draw(self.w)
             switch_mode.draw(self.w)
             switch_lang.draw(self.w)
 

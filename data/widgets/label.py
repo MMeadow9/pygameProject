@@ -5,7 +5,7 @@ pygame.init()
 
 class Label:
     def __init__(self, center: list[int] | tuple[int],
-                 text: str | list[str],
+                 text: str,
                  text_color: pygame.color.Color | tuple[int] | list[int] | None = (0, 0, 0),
                  font_name: str = None,
                  font: pygame.font.Font = None,
