@@ -4,10 +4,10 @@ pygame.init()
 
 
 class Button:
-    def __init__(self, rect: tuple[int] | list[int],
+    def __init__(self, rect: tuple[int, int, int, int] | list[int, int, int, int],
                  text: str,
-                 back_color: pygame.Color | tuple[int] | list[int] | None = (255, 255, 255),
-                 text_color: pygame.Color | tuple[int] | list[int] = (0, 0, 0),
+                 back_color: pygame.Color | tuple[int, int, int] | list[int, int, int] | None = (255, 255, 255),
+                 text_color: pygame.Color | tuple[int, int, int] | list[int, int, int] = (0, 0, 0),
                  is_antialias: bool | int = True,
                  is_bold: bool | int = False,
                  is_italic: bool | int = False,
@@ -122,7 +122,7 @@ class Button:
                     self.pos) if self.image else 0
 
 
-    def check_on(self, pos: tuple[int] | list[int]):
+    def check_on(self, pos: tuple[int, int] | list[int, int]):
         if self.collide_point(pos):
             self.color = self.back_color_dark
         else:

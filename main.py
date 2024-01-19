@@ -54,7 +54,7 @@ class MainGame:
 
         self.all_sprites = pygame.sprite.Group()
 
-        self.volume = 5
+        self.volume = 1
 
         self.to_menu()
 
@@ -62,6 +62,8 @@ class MainGame:
         if not self.music_is_already_played:
             pygame.mixer.music.load("data/sounds/back_music.mp3")
             pygame.mixer.music.play(-1)
+
+            pygame.mixer.music.set_volume(self.volume * 0.2)
 
             self.music_is_already_played = 1
 
@@ -112,7 +114,7 @@ class MainGame:
             (25, 30, 650, 100), [153] * 3,
             [{0: "Выкл.", 1: "OFF"}[self.language]] + list("12345"),
             [
-                [35, 40, 140, 80], [175 + 28, 40, 70, 80], [245 + 28 * 2, 40, 70, 80], [315 + 28 * 3, 40, 70, 80],
+                [35, 40, 140, 80], [175 + 28, 60, 70, 60], [245 + 28 * 2, 60, 70, 60], [315 + 28 * 3, 60, 70, 60],
                 [385 + 28 * 4, 40, 70, 80], [455 + 28 * 5, 40, 70, 80]
             ],
             [
@@ -145,6 +147,9 @@ class MainGame:
                              {0: "В Меню", 1: "To Menu"}[self.language],
                              fsize=62, rounding=10, function=self.to_menu)
 
+        label_volume = Label((336, 25), {0: "Громкость", 1: "Volume"}[self.language], text_color=(255, 255, 255),
+                             fsize=40)
+
         while True:
             pygame.mixer.music.set_volume(self.volume * 0.2)
 
@@ -160,6 +165,9 @@ class MainGame:
             switch_volume.texts[0] = {0: "Выкл.", 1: "OFF"}[self.language]
             switch_volume.fsize = {0: 48, 1: 56}[self.language]
 
+            label_volume.text = {0: "Громкость", 1: "Volume"}[self.language]
+            label_volume.fsize = {0: 40, 1: 44}[self.language]
+
             self.w.fill((0, 0, 0))
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
@@ -174,7 +182,6 @@ class MainGame:
 
             button_menu.check_on((self.x, self.y))
 
-
             self.language = switch_lang.get_selected()
             self.mode = switch_mode.get_selected()
 
@@ -183,6 +190,10 @@ class MainGame:
             switch_lang.draw(self.w)
 
             button_menu.draw(self.w)
+
+            pygame.draw.rect(self.w, (0, 0, 0), (175 + 28, 0, 266, 50), border_radius=20)
+
+            label_volume.draw(self.w)
 
             pygame.display.update()
             clock.tick(FPS)
@@ -293,11 +304,11 @@ class MainGame:
             clock.tick(FPS)
 
     def minus_id_level(self):
-        self.levelID = max([0, min([self.levelID - 1, len(levels_json) - 1])])
+        self.levelID = (self.levelID - 1) % len(levels_json)
         self.to_select_level()
 
     def plus_id_level(self):
-        self.levelID = max([0, min([self.levelID + 1, len(levels_json) - 1])])
+        self.levelID = (self.levelID + 1) % len(levels_json)
         self.to_select_level()
 
     def open_level_url(self):
@@ -323,11 +334,23 @@ class MainGame:
 
         spawns = level["spawn_notes"]
 
+        is_light = level["is_light"]
+
         if self.mode:
             spawns = 0
 
+        spawns_rects = []
 
-        button_pause = Button((655, 15, 30, 30), "", None, image="data/images/pause.png",
+        size = 600 / {1: 3, 2: 4, 3: 6}[comp]
+
+
+
+        if self.mode:
+            for spawn in spawns:
+                pass
+
+
+        button_pause = Button((660, 10, 30, 30), "", None, image="data/images/pause.png",
                               function=self.fill_alpha)
 
         button_quit_menu = Button((250, 300, 200, 60), {0: "Продолжить", 1: "Continue"}[self.language],
@@ -339,12 +362,19 @@ class MainGame:
         button_quit_level = Button((260, 100, 180, 60), {0: "Выйти", 1: "Exit"}[self.language],
                                    is_italic=True, fsize=60, rounding=12, function=self.to_select_level)
 
-
-
         on_menu = False
 
-        pygame.mixer.music.load(level["music"])
+        wait = level["wait"]
+
+        pygame.mixer.music.load(music)
         pygame.mixer.music.play(1)
+
+        good_res, all_res = 0, 0
+
+        lines = [
+            [(x + 1) * (650 / {1: 3, 2: 4, 3: 6}[comp]), 0, 1,
+             500] for x in range({1: 3, 2: 4, 3: 6}[comp])
+        ] + [[650, 0, 2, 500]]
 
         while True:
             self.w.fill(back_color)
@@ -356,31 +386,61 @@ class MainGame:
                     if button_pause.collide_point(e.pos):
                         on_menu = True
 
-
                     if on_menu:
                         button_quit_level.check_click(e.pos)
 
+                        button_play_again.check_click(e.pos)
+
                         if button_quit_menu.collide_point(e.pos):
                             on_menu = False
-                    else:
-                        pass
 
             self.w.blit(
                 pygame.transform.scale(pygame.image.load(back_image), (700, 500))
                 (0, 0)) if back_image else 0
 
-            button_pause.draw(self.w)
+            def draw_stat():
+                table = pygame.surface.Surface((50, 500))
+                table.fill([(not is_light) * 255] * 3)
+
+                statistic = pygame.surface.Surface((40, 490))
+                statistic.fill((0, 255, 0))
+
+                try:
+                    bad_line = int(490 * (good_res / all_res))
+                except ZeroDivisionError:
+                    bad_line = 0
+
+                table.blit(statistic, (5, 5))
+
+                pygame.draw.rect(statistic, (255, 0, 0), (0, 0, 40, bad_line))
+
+                self.w.blit(table, (650, 50))
 
             if on_menu:
+                draw_stat()
+
+                self.w.blit(pygame.surface.Surface((50, 500)), (650, 0))
+                [pygame.draw.rect(self.w, [(not is_light) * 255] * 3, line) for line in lines]
+                button_pause.draw(self.w)
+
                 self.fill_alpha()
                 pygame.mixer.music.pause()
                 [button.draw(self.w) for button in [button_quit_level, button_quit_menu, button_play_again]]
             else:
+                draw_stat()
+
+                if iters_of_game < wait * 45:
+                    pygame.mixer.music.pause()
+                else:
+                    pygame.mixer.music.unpause()
+
+                [rect for rect in rects]
+
+                [pygame.draw.rect(self.w, [(not is_light) * 255] * 3, line) for line in lines]
                 iters_of_game += 1
 
+                button_pause.draw(self.w)
 
-
-                pygame.mixer.music.unpause()
             pygame.display.update()
             clock.tick(FPS)
 
@@ -393,8 +453,6 @@ class MainGame:
 
     def fill_alpha(self, color: tuple[int, int, int] = (0, 0, 0)):
         self.fill(color, 128)
-
-
 
 
 MainGame(window)

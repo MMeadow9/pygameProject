@@ -2,7 +2,7 @@
   "level1": {
     "music": "data/sounds/sound1.mp3",
     "icon": "data/images/icon1.png",
-    "background_image": 0,
+    "background_image": null,
     "background_color": [40, 0, 30],
     "complexity": 1,
     "figures": {
@@ -16,13 +16,15 @@
       },
       "link": "https://youtu.be/ht-eTQW-p0w?si=rYd2kN3dAhIXyCjZ",
       "duration": 67
-    }
+    },
+    "is_light": false,
+    "wait": 4.5
   },
 
   "level2": {
     "music": "data/sounds/sound2.mp3",
     "icon": "data/images/icon2.png",
-    "background_image": 0,
+    "background_image": null,
     "background_color": [0, 255, 255],
     "complexity": 2,
     "figures": {
@@ -51,13 +53,15 @@
       "5224": "Q", "5257": "Q", "5273": "W", "5292": "E", "5312": "Q", "5330": "R", "5347": "W", "5365": "W", "5387": "R", "5406": "W", "5422": "E", "5441": "Q", "5481": "E", "5498": "Q", "5516": "Q", "5553": "Q", "5571": "R", "5588": "R", "5628": "W", "5641": "E", "5665": "E", "5684": "R", "5702": "Q", "5720": "R", "5737": "Q", "5755": "W", "5771": "Q", "5784": "R", "5796": "E", "5814": "W", "5828": "W", "5841": "R",
       "5855": "Q", "5867": "E", "5886": "W", "5900": "Q", "5916": "W", "5929": "W", "5953": "Q", "5963": "R", "5978": "E", "5988": "Q", "5998": "E", "6014": "R", "6029": "Q", "6071": "Q", "6086": "W", "6106": "R", "6147": "Q", "6159": "W", "6180": "W", "6216": "R", "6235": "E", "6255": "W", "6272": "W", "6290": "Q", "6308": "Q", "6329": "Q", "6345": "Q", "6365": "Q", "6380": "Q", "6390": "R", "6406": "Q", "6419": "W",
       "6435": "Q", "6449": "R", "6461": "R", "6478": "R", "6494": "R", "6510": "W", "6523": "Q", "6543": "R", "6553": "E", "6570": "E", "6588": "E", "6604": "Q", "6625": "W"
-    }
+    },
+    "is_light": true,
+    "wait": 5
   },
 
   "level3": {
     "music": "data/sounds/sound3.mp3",
     "icon": "data/images/icon3.png",
-    "background_image": 0,
+    "background_image": null,
     "background_color": [0, 0, 0],
     "complexity": 3,
     "figures": {
@@ -89,7 +93,8 @@
       },
       "link": "https://youtu.be/tkY1vTeVBUA?si=EQYSgfacv4Qr-U_U",
       "duration": 273
-    }
-  }
+    },
+  "is_light": false,
+  "wait": 5.5}
 
 }
