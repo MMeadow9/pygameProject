@@ -116,6 +116,10 @@ class MainGame:
             [button.draw(self.w)
                 for button in [button_play, button_settings, button_guide]]
 
+            self.set_cursor(any([button.collide_point((self.x, self.y)) for button in [
+                button_play, button_settings, button_guide
+            ]]))
+
             pygame.display.update()
             clock.tick(FPS)
 
@@ -212,6 +216,10 @@ class MainGame:
             pygame.draw.rect(self.w, (0, 0, 0), (175 + 28, 0, 266, 50), border_radius=20)
 
             label_volume.draw(self.w)
+
+            self.set_cursor(any([button.collide_point((self.x, self.y)) for button in [
+                button_menu, switch_volume, switch_mode, switch_lang
+            ]]))
 
             pygame.display.update()
             clock.tick(FPS)
@@ -318,6 +326,10 @@ class MainGame:
                 self.w.blit(image_star, (x1, 105))
                 x1 += 65
 
+            self.set_cursor(any([button.collide_point((self.x, self.y)) for button in [
+                button_play, button_open, button_menu, button_next, button_prev
+            ]]))
+
             pygame.display.update()
             clock.tick(FPS)
 
@@ -415,21 +427,18 @@ class MainGame:
                     exit()
                 if e.type == pygame.MOUSEBUTTONDOWN:
                     if button_pause.collide_point(e.pos):
-                        on_menu = True
+                        on_menu = bool(on_menu - 1)
 
                     if on_menu:
-                        if on_menu:
-                            button_quit_level.check_click(e.pos)
+                        button_quit_level.check_click(e.pos)
 
-                            button_play_again.check_click(e.pos)
+                        button_play_again.check_click(e.pos)
 
-                            if button_quit_menu.collide_point(e.pos):
-                                on_menu = False
+                        if button_quit_menu.collide_point(e.pos):
+                            on_menu = False
 
                 if e.type == pygame.MOUSEMOTION:
                     self.x, self.y = e.pos
-
-
 
             self.w.blit(
                 pygame.transform.scale(pygame.image.load(back_image), (700, 500))
@@ -460,10 +469,8 @@ class MainGame:
             if on_menu:
 
                 [pygame.draw.rect(self.w, [(not is_light) * 255] * 3, line) for line in lines]
-                button_pause.draw(self.w)
-                pygame.draw.rect(self.w, back_color, (653, 0, 50, 50))
 
-                button_pause.draw(self.w)
+                pygame.draw.rect(self.w, back_color, (653, 0, 50, 50))
 
                 draw_stat()
 
@@ -472,7 +479,11 @@ class MainGame:
 
 
                 [button.check_on((self.x, self.y)) for button in [button_quit_level, button_quit_menu, button_play_again]]
-                [button.draw(self.w) for button in [button_quit_level, button_quit_menu, button_play_again]]
+                [button.draw(self.w) for button in [button_quit_level, button_quit_menu, button_play_again, button_pause]]
+
+                self.set_cursor(any([button.collide_point((self.x, self.y)) for button in [
+                    button_quit_level, button_play_again, button_quit_menu, button_pause
+                ]]))
             else:
                 pygame.draw.rect(self.w, back_color, (650, 0, 50, 50))
 
@@ -519,6 +530,10 @@ class MainGame:
 
                 button_pause.draw(self.w)
 
+                self.set_cursor(any([button.collide_point((self.x, self.y)) for button in [
+                    button_pause
+                ]]))
+
             pygame.display.update()
             clock.tick(FPS)
 
@@ -532,8 +547,15 @@ class MainGame:
     def fill_alpha(self, color: tuple[int, int, int] = (0, 0, 0)):
         self.fill(color, 128)
 
-    def set_cursor(self):
-        pass
+    def set_cursor(self, a: bool | int):
+        if a:
+            pygame.mouse.set_visible(False)
+
+            self.w.blit(pygame.transform.scale(pygame.image.load("data/images/cursor.png"), (16, 20)), (self.x, self.y))
+        else:
+            pygame.mouse.set_visible(True)
+
+
 
 
 MainGame(window)
