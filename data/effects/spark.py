@@ -10,7 +10,7 @@ class Spark(pygame.sprite.Sprite):
 
         size = choice([1] * (3 ** 4) + [2] * (3 ** 2) + [3])
 
-        self.rect = pygame.rect.Rect(*pos, *[size] * 2)
+        self.rect = pygame.rect.Rect(*pos, *([size] * 2))
 
         self.color = choice(
             [(255, 183, 3), (255, 194, 41), (255, 202, 69), (247, 75, 32), (255, 0, 0)]

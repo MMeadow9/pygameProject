@@ -36,6 +36,24 @@ def customize_sizes(size1: tuple[int] | list[int], size2: tuple[int] | list[int]
     return (int(x2 * z), int(y2 * z))
 
 
+def get_obj(obj: str | int | None) -> str | int | None:
+    result = None  # coordination
+
+    if type(obj) == str:  # Если это строка
+        if obj.startswith("choice"):  # Если она начинается с choice
+            result = choice(obj.split()[1:])  # Получаем случайный объект из строки
+        elif obj.startswith("randint"):  # Если она начинается с randint
+            result = randint(int(obj.split()[1]),
+                        int(obj.split()[2]))  # Получаем случайное число между 1-ым и 2-ым элементами
+        else:  # Если не начинается с choice или randint
+            result = obj  # Значит нам нужна вся строка
+    else:
+        result = obj  # Если это не строка (значит число), то просто сохраняем это в переменную
+
+    return result  # Возвращаем объект
+
+
+
 class MainGame:
     def __init__(self, window: pygame.surface.Surface):
         self.w = window
@@ -54,7 +72,7 @@ class MainGame:
 
         self.all_sprites = pygame.sprite.Group()
 
-        self.volume = 1
+        self.volume = 0
 
         self.to_menu()
 
@@ -315,10 +333,11 @@ class MainGame:
         webbrowser.open(levels_json[f"level{self.levelID + 1}"]["data"]["link"])
 
     def play(self):
+        self.all_sprites = pygame.sprite.Group()
+
         self.music_is_already_played = 0
 
         level = levels_json[f"level{self.levelID + 1}"]
-        in_menu = False
 
         music = level["music"]
         icon = level["icon"]
@@ -332,7 +351,7 @@ class MainGame:
 
         comp = level["complexity"]
 
-        spawns = level["spawn_notes"]
+        #spawns = level["spawn_notes"]
 
         is_light = level["is_light"]
 
@@ -341,13 +360,14 @@ class MainGame:
 
         spawns_rects = []
 
-        size = 600 / {1: 3, 2: 4, 3: 6}[comp]
+        game_lines = {1: 3, 2: 4, 3: 6}[comp]
+
+        size = 600 / game_lines
 
 
-
-        if self.mode:
-            for spawn in spawns:
-                pass
+        #if self.mode:
+            #for spawn in spawns:
+                #spawns_rects.append(([size * randint(0, game_lines - 1)]))
 
 
         button_pause = Button((660, 10, 30, 30), "", None, image="data/images/pause.png",
@@ -366,15 +386,26 @@ class MainGame:
 
         wait = level["wait"]
 
+        effects = level["effects"]
+
+        particles = effects["particle"]
+        petals = effects["petal"]
+        sparks = effects["spark"]
+
         pygame.mixer.music.load(music)
         pygame.mixer.music.play(1)
+        pygame.mixer.music.set_volume(self.volume * 0.2)
 
         good_res, all_res = 0, 0
 
+        ewait = float(effects["wait"]) * 40  # effect wait
+
         lines = [
-            [(x + 1) * (650 / {1: 3, 2: 4, 3: 6}[comp]), 0, 1,
-             500] for x in range({1: 3, 2: 4, 3: 6}[comp])
+            [(x + 1) * (650 / game_lines), 0, 1,
+             500] for x in range(game_lines)
         ] + [[650, 0, 2, 500]]
+
+        time = 0
 
         while True:
             self.w.fill(back_color)
@@ -387,22 +418,30 @@ class MainGame:
                         on_menu = True
 
                     if on_menu:
-                        button_quit_level.check_click(e.pos)
+                        if on_menu:
+                            button_quit_level.check_click(e.pos)
 
-                        button_play_again.check_click(e.pos)
+                            button_play_again.check_click(e.pos)
 
-                        if button_quit_menu.collide_point(e.pos):
-                            on_menu = False
+                            if button_quit_menu.collide_point(e.pos):
+                                on_menu = False
+
+                if e.type == pygame.MOUSEMOTION:
+                    self.x, self.y = e.pos
+
+
 
             self.w.blit(
                 pygame.transform.scale(pygame.image.load(back_image), (700, 500))
                 (0, 0)) if back_image else 0
 
+            [pygame.draw.rect(self.w, *rect) for rect in rects[::-1]]
+
             def draw_stat():
                 table = pygame.surface.Surface((50, 500))
                 table.fill([(not is_light) * 255] * 3)
 
-                statistic = pygame.surface.Surface((40, 490))
+                statistic = pygame.surface.Surface((40, 440))
                 statistic.fill((0, 255, 0))
 
                 try:
@@ -416,25 +455,64 @@ class MainGame:
 
                 self.w.blit(table, (650, 50))
 
-            if on_menu:
-                draw_stat()
+            self.all_sprites.draw(self.w)
 
-                self.w.blit(pygame.surface.Surface((50, 500)), (650, 0))
+            if on_menu:
+
                 [pygame.draw.rect(self.w, [(not is_light) * 255] * 3, line) for line in lines]
                 button_pause.draw(self.w)
+                pygame.draw.rect(self.w, back_color, (653, 0, 50, 50))
+
+                button_pause.draw(self.w)
+
+                draw_stat()
 
                 self.fill_alpha()
                 pygame.mixer.music.pause()
+
+
+                [button.check_on((self.x, self.y)) for button in [button_quit_level, button_quit_menu, button_play_again]]
                 [button.draw(self.w) for button in [button_quit_level, button_quit_menu, button_play_again]]
             else:
+                pygame.draw.rect(self.w, back_color, (650, 0, 50, 50))
+
+                time += ewait
+
+                while 1 < time:
+                    if particles:  # Создание эффекта-частиц
+                        x = get_obj(particles[0])
+                        y = get_obj(particles[1])
+                        color = get_obj(particles[2]) if len(particles) > 2 else None
+
+                        Particle(self.all_sprites, x, y, color) if color else Particle(self.all_sprites, x, y)
+
+                    if petals:  # Создание эффекта-лепестков
+                        color = get_obj(petals[0])
+                        pos = (int(get_obj(petals[1][0])), int(get_obj(petals[1][1])))
+                        direction = get_obj(petals[2])
+                        rl = get_obj(petals[3])
+                        ud = get_obj(petals[4])
+                        msp = get_obj(petals[5])  # max speed
+                        msz = get_obj(petals[6])  # max size
+
+                        Petal(self.all_sprites, color, pos, direction, rl, ud, msp, msz)
+
+                    if sparks:  # Создание эффекта-искр
+                        x = get_obj(sparks[0])
+                        y = get_obj(sparks[1])
+
+                        Spark(self.all_sprites, (x, y))
+
+                    time -= 1
+
+                self.all_sprites.update()
+
                 draw_stat()
 
-                if iters_of_game < wait * 45:
+                if iters_of_game < wait * 40:
                     pygame.mixer.music.pause()
                 else:
                     pygame.mixer.music.unpause()
-
-                [rect for rect in rects]
 
                 [pygame.draw.rect(self.w, [(not is_light) * 255] * 3, line) for line in lines]
                 iters_of_game += 1
@@ -453,6 +531,9 @@ class MainGame:
 
     def fill_alpha(self, color: tuple[int, int, int] = (0, 0, 0)):
         self.fill(color, 128)
+
+    def set_cursor(self):
+        pass
 
 
 MainGame(window)

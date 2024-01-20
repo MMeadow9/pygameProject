@@ -121,7 +121,6 @@ class Button:
         window.blit(pygame.transform.scale(pygame.image.load(self.image), self.rect.size),
                     self.pos) if self.image else 0
 
-
     def check_on(self, pos: tuple[int, int] | list[int, int]):
         if self.collide_point(pos):
             self.color = self.back_color_dark

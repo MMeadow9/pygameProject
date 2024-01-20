@@ -5,10 +5,10 @@ pygame.init()
 
 
 class Petal(pygame.sprite.Sprite):
-    def __init__(self, group, color, pos, d="D", rl="RL", ud="DDDU", ws=(700, 500)):
+    def __init__(self, group, color, pos, d="D", rl="RL", ud="DDDU", max_speed=20, max_size=10, ws=(700, 500)):
         super().__init__(group)
 
-        size = randint(5, 10)
+        size = randint(5, max_size)
 
         self.angle = randint(0, 359)
 
@@ -23,8 +23,8 @@ class Petal(pygame.sprite.Sprite):
 
         self.rect = pygame.rect.Rect(*pos, size + 3, size)
 
-        self.vx = (randint(3, 20) - size // 5) * (-1 if d == "L" else 1)
-        self.vy = (randint(3, 20) - size // 5) * (-1 if d == "U" else 1)
+        self.vx = (randint(3, max_speed) - size // 5) * (-1 if d == "L" else 1)
+        self.vy = (randint(3, max_speed) - size // 5) * (-1 if d == "U" else 1)
 
         self.d = d
 
