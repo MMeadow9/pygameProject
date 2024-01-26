@@ -19,6 +19,9 @@
     },
     "is_light": false,
     "wait": 4.5,
+    "letter_colors": [
+      [170, 75, 100], [150, 75, 120], [130, 75, 140]
+    ],
     "effects": {
       "particle": null,
       "petal": [
@@ -31,7 +34,7 @@
         12
       ],
       "spark": null,
-      "wait": "0.005"
+      "wait": "0.0075"
     }
   },
 
@@ -70,6 +73,9 @@
     },
     "is_light": true,
     "wait": 5,
+    "letter_colors": [
+      [64, 224, 192], [128, 224, 224], [64, 192, 224], [64, 128, 224]
+    ],
     "effects": {
       "particle": null,
       "petal": null,
@@ -116,6 +122,7 @@
     },
   "is_light": false,
   "wait": 5.5,
+  "letter_colors": null,
   "effects": {
     "particle": [325, 245],
     "petal": null,

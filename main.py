@@ -374,7 +374,26 @@ class MainGame:
 
         game_lines = {1: 3, 2: 4, 3: 6}[comp]
 
-        size = 600 / game_lines
+        size = 650 / game_lines
+
+
+        def draw_stat():
+            table = pygame.surface.Surface((50, 500))
+            table.fill([(not is_light) * 255] * 3)
+
+            statistic = pygame.surface.Surface((40, 440))
+            statistic.fill((0, 255, 0))
+
+            try:
+                bad_line = int(490 * (good_res / all_res))
+            except ZeroDivisionError:
+                bad_line = 0
+
+            table.blit(statistic, (5, 5))
+
+            pygame.draw.rect(statistic, (255, 0, 0), (0, 0, 40, bad_line))
+
+            self.w.blit(table, (650, 50))
 
 
         #if self.mode:
@@ -408,6 +427,8 @@ class MainGame:
         pygame.mixer.music.play(1)
         pygame.mixer.music.set_volume(self.volume * 0.2)
 
+        letters_colors = level["letter_colors"]
+
         good_res, all_res = 0, 0
 
         ewait = float(effects["wait"]) * 40  # effect wait
@@ -418,6 +439,19 @@ class MainGame:
         ] + [[650, 0, 2, 500]]
 
         time = 0
+
+        letters = [
+            Label([x * size + size / 2, 463], "QWERTY"[x], fsize=60,
+                  text_color=([255] * 3 if is_light else [0] * 3))
+            for x in range(game_lines)
+        ]
+
+        letters_rects = [
+            [letters_colors[x] if letters_colors else
+                ([204] * 3 if not is_light else [41] * 3),
+             [round(x * size), 425, round(size), 75]]
+            for x in range(game_lines)
+        ]
 
         while True:
             self.w.fill(back_color)
@@ -446,37 +480,20 @@ class MainGame:
 
             [pygame.draw.rect(self.w, *rect) for rect in rects[::-1]]
 
-            def draw_stat():
-                table = pygame.surface.Surface((50, 500))
-                table.fill([(not is_light) * 255] * 3)
-
-                statistic = pygame.surface.Surface((40, 440))
-                statistic.fill((0, 255, 0))
-
-                try:
-                    bad_line = int(490 * (good_res / all_res))
-                except ZeroDivisionError:
-                    bad_line = 0
-
-                table.blit(statistic, (5, 5))
-
-                pygame.draw.rect(statistic, (255, 0, 0), (0, 0, 40, bad_line))
-
-                self.w.blit(table, (650, 50))
-
             self.all_sprites.draw(self.w)
+            draw_stat()
 
             if on_menu:
+                [pygame.draw.rect(self.w, *rect) for rect in letters_rects]
+
+                [label.draw(self.w) for label in letters]
 
                 [pygame.draw.rect(self.w, [(not is_light) * 255] * 3, line) for line in lines]
 
                 pygame.draw.rect(self.w, back_color, (653, 0, 50, 50))
 
-                draw_stat()
-
                 self.fill_alpha()
                 pygame.mixer.music.pause()
-
 
                 [button.check_on((self.x, self.y)) for button in [button_quit_level, button_quit_menu, button_play_again]]
                 [button.draw(self.w) for button in [button_quit_level, button_quit_menu, button_play_again, button_pause]]
@@ -485,6 +502,10 @@ class MainGame:
                     button_quit_level, button_play_again, button_quit_menu, button_pause
                 ]]))
             else:
+                [pygame.draw.rect(self.w, *rect) for rect in letters_rects]
+
+                [label.draw(self.w) for label in letters]
+
                 pygame.draw.rect(self.w, back_color, (650, 0, 50, 50))
 
                 time += ewait
@@ -518,8 +539,6 @@ class MainGame:
 
                 self.all_sprites.update()
 
-                draw_stat()
-
                 if iters_of_game < wait * 40:
                     pygame.mixer.music.pause()
                 else:
@@ -549,13 +568,9 @@ class MainGame:
 
     def set_cursor(self, a: bool | int):
         if a:
-            pygame.mouse.set_visible(False)
-
-            self.w.blit(pygame.transform.scale(pygame.image.load("data/images/cursor.png"), (16, 20)), (self.x, self.y))
+            pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_HAND))
         else:
-            pygame.mouse.set_visible(True)
-
-
+            pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_ARROW))
 
 
 MainGame(window)

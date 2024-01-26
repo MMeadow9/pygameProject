@@ -12,7 +12,10 @@ class Petal(pygame.sprite.Sprite):
 
         self.angle = randint(0, 359)
 
-        self.rotate = randint(-2, 10)
+        self.rotate = randint(-6, 6)
+
+        while not self.rotate:
+            self.rotate = randint(-6, 6)
 
         self.fimage = pygame.surface.Surface((size + 3, size), pygame.SRCALPHA)
 
