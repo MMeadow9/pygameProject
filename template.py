@@ -1,4 +1,4 @@
-import pygame
+"""import pygame
 from random import choices
 
 pygame.init()
@@ -47,3 +47,9 @@ while 1:
 
     pygame.display.update()
     clock.tick(FPS)
+"""
+
+print(*[
+    [[255 - i * 30] * 3, [317 - i * 3, 242 - i, 16 + i * 6, 6 + i * 2]]
+    for i in range(9)
+], sep="\n")

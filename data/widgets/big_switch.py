@@ -12,7 +12,8 @@ class BigSwitch:
                  rounding: int = 5,
                  font_name: str = None,
                  font: pygame.font.Font = None,
-                 fsize: int = 20):
+                 fsize: int = 20,
+                 text_color: tuple[int, int, int] = (0, 0, 0)):
         self.main_rect = main_rect if type(main_rect) not in (tuple, list) else pygame.rect.Rect(*main_rect)
         self.back_color = back_color
 
@@ -30,6 +31,8 @@ class BigSwitch:
         self.fsize = fsize
 
         self.rounding = rounding
+
+        self.text_color = text_color
 
     def get_selected(self) -> int:
         return self.selected
@@ -55,7 +58,7 @@ class BigSwitch:
         for index in range(len(self.option_rects)):
             rect, text = pygame.rect.Rect(*self.option_rects[index]), self.texts[index]
 
-            image = font.render(text, True, (0, 0, 0))
+            image = font.render(text, True, self.text_color)
 
             window.blit(image, (
                 rect.centerx - image.get_width() // 2,

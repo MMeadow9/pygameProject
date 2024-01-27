@@ -404,14 +404,37 @@ class MainGame:
         button_pause = Button((660, 10, 30, 30), "", None, image="data/images/pause.png",
                               function=self.fill_alpha)
 
-        button_quit_menu = Button((250, 300, 200, 60), {0: "Продолжить", 1: "Continue"}[self.language],
+        button_quit_menu = Button((100, 300, 200, 60), {0: "Продолжить", 1: "Continue"}[self.language],
                                   is_italic=True, fsize={0: 40, 1: 50}[self.language], rounding=12)
 
-        button_play_again = Button((255, 200, 190, 60), {0: "Заново", 1: "Play Again"}[self.language],
+        button_play_again = Button((105, 200, 190, 60), {0: "Заново", 1: "Play Again"}[self.language],
                                    is_italic=True, fsize=50, rounding=12, function=self.play)
 
-        button_quit_level = Button((260, 100, 180, 60), {0: "Выйти", 1: "Exit"}[self.language],
+        button_quit_level = Button((110, 100, 180, 60), {0: "Выйти", 1: "Exit"}[self.language],
                                    is_italic=True, fsize=60, rounding=12, function=self.to_select_level)
+
+        switch_volume = BigSwitch(
+            (350, 120, 220, 230),
+            [153 - 26 * is_light] * 3,
+            [{0: "Выкл.", 1: "OFF"}[self.language]] + list("12345"),
+            [
+                [360, 130, 95, 60], [455, 130, 95, 60], [360, 200, 95, 60], [455, 200, 95, 60],
+                [360, 280, 95, 60], [455, 280, 95, 60]
+            ],
+            [
+                (255, 0, 0), (255, 128, 0), (255, 255, 0), (128, 255, 0), (0, 255, 0), (0, 255, 128)
+            ],
+            fsize={0: 40, 1: 50}[self.language],
+            rounding=20
+        )
+
+        switch_volume.selected = self.volume
+
+        label_volume = Label(
+            (460, 90),
+            {0: "Громкость", 1: "Volume"}[self.language],
+            [255 - 255 * is_light] * 3, fsize=50
+        )
 
         on_menu = False
 
@@ -468,6 +491,8 @@ class MainGame:
 
                         button_play_again.check_click(e.pos)
 
+                        switch_volume.check_click(e.pos)
+
                         if button_quit_menu.collide_point(e.pos):
                             on_menu = False
 
@@ -479,6 +504,7 @@ class MainGame:
                 (0, 0)) if back_image else 0
 
             [pygame.draw.rect(self.w, *rect) for rect in rects[::-1]]
+            [pygame.draw.ellipse(self.w, *ellips) for ellips in ellipses[::-1]]
 
             self.all_sprites.draw(self.w)
             draw_stat()
@@ -498,8 +524,15 @@ class MainGame:
                 [button.check_on((self.x, self.y)) for button in [button_quit_level, button_quit_menu, button_play_again]]
                 [button.draw(self.w) for button in [button_quit_level, button_quit_menu, button_play_again, button_pause]]
 
+                self.volume = switch_volume.get_selected()
+
+                pygame.mixer.music.set_volume(self.volume * 0.2)
+
+                switch_volume.draw(self.w)
+                label_volume.draw(self.w)
+
                 self.set_cursor(any([button.collide_point((self.x, self.y)) for button in [
-                    button_quit_level, button_play_again, button_quit_menu, button_pause
+                    button_quit_level, button_play_again, button_quit_menu, button_pause, switch_volume
                 ]]))
             else:
                 [pygame.draw.rect(self.w, *rect) for rect in letters_rects]
@@ -567,10 +600,12 @@ class MainGame:
         self.fill(color, 128)
 
     def set_cursor(self, a: bool | int):
-        if a:
+        if a == 1:
             pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_HAND))
-        else:
+        elif not a:
             pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_ARROW))
+        elif a == 2:
+            pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_IBEAM))
 
 
 MainGame(window)

@@ -26,8 +26,8 @@ class Petal(pygame.sprite.Sprite):
 
         self.rect = pygame.rect.Rect(*pos, size + 3, size)
 
-        self.vx = (randint(3, max_speed) - size // 5) * (-1 if d == "L" else 1)
-        self.vy = (randint(3, max_speed) - size // 5) * (-1 if d == "U" else 1)
+        self.vx = (randint(5, max_speed) - size // 5) * (-1 if d == "L" else 1)
+        self.vy = (randint(5, max_speed) - size // 5) * (-1 if d == "U" else 1)
 
         self.d = d
 
