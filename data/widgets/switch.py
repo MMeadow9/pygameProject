@@ -37,6 +37,8 @@ class Switch:
 
         self.sec_c = second_option_color
 
+        self.id = 1
+
     def get_selected(self) -> int:
         return self.selected
 

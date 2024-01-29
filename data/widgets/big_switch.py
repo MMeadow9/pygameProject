@@ -17,6 +17,8 @@ class BigSwitch:
         self.main_rect = main_rect if type(main_rect) not in (tuple, list) else pygame.rect.Rect(*main_rect)
         self.back_color = back_color
 
+        self.id = 1
+
         self.texts = texts
 
         self.option_rects = option_rects

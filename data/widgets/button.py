@@ -61,6 +61,8 @@ class Button:
 
         self.pos = self.rect.x, self.rect.y
 
+        self.id = 1
+
     def set_rect(self, rect: tuple[int, int, int, int] | list[int, int, int, int]):
         self.rect = pygame.rect.Rect(*rect)
         self.pos = self.rect.x, self.rect.y

@@ -217,9 +217,9 @@ class MainGame:
 
             label_volume.draw(self.w)
 
-            self.set_cursor(any([button.collide_point((self.x, self.y)) for button in [
-                button_menu, switch_volume, switch_mode, switch_lang
-            ]]))
+            self.set_cursor(max([0] + [obj.id for obj in [
+                button_menu, switch_volume, switch_mode, switch_lang, label_volume
+            ] if obj.collide_point((self.x, self.y))]))
 
             pygame.display.update()
             clock.tick(FPS)
@@ -326,9 +326,9 @@ class MainGame:
                 self.w.blit(image_star, (x1, 105))
                 x1 += 65
 
-            self.set_cursor(any([button.collide_point((self.x, self.y)) for button in [
-                button_play, button_open, button_menu, button_next, button_prev
-            ]]))
+            self.set_cursor(max([0] + [obj.id for obj in [
+                button_menu, button_open, button_play, button_next, button_prev, label_duration, label_name
+            ] if obj.collide_point((self.x, self.y))]))
 
             pygame.display.update()
             clock.tick(FPS)
@@ -531,9 +531,9 @@ class MainGame:
                 switch_volume.draw(self.w)
                 label_volume.draw(self.w)
 
-                self.set_cursor(any([button.collide_point((self.x, self.y)) for button in [
-                    button_quit_level, button_play_again, button_quit_menu, button_pause, switch_volume
-                ]]))
+                self.set_cursor(max([0] + [obj.id for obj in [
+                    button_pause, switch_volume, button_play_again, button_quit_menu, label_volume, button_quit_level
+                ] if obj.collide_point((self.x, self.y))]))
             else:
                 [pygame.draw.rect(self.w, *rect) for rect in letters_rects]
 

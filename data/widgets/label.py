@@ -16,6 +16,7 @@ class Label:
         self.font_name = font_name
         self.font = font
         self.fsize = fsize
+        self.id = 2
 
     def draw(self, window):
         text = pygame.font.Font(self.font_name, self.fsize).render(self.text, True, self.text_color) \
@@ -26,3 +27,12 @@ class Label:
                         self.center[0] - text.get_width() // 2,
                         self.center[1] - text.get_height() // 2
                     ))
+
+    def collide_point(self, pos):
+        rect = (pygame.font.Font(self.font_name, self.fsize).render(self.text, True, self.text_color) \
+            if not self.font else self.font).get_rect()
+
+        rect.x = self.center[0] - rect.width // 2
+        rect.y = self.center[1] - rect.height // 2
+
+        return rect.collidepoint(*pos)
