@@ -351,6 +351,9 @@ class MainGame:
 
         level = levels_json[f"level{self.levelID + 1}"]
 
+        level_data = level["data"]
+        level_name = level_data["name"][str(self.language)]
+
         music = level["music"]
         icon = level["icon"]
         back_image = level["background_image"]
@@ -372,7 +375,9 @@ class MainGame:
 
         spawns_rects = []
 
-        game_lines = {1: 3, 2: 4, 3: 6}[comp]
+        dct_lines = {1: 3, 2: 4, 3: 6, 4: 8, 5: 10}
+
+        game_lines = dct_lines[comp]
 
         size = 650 / game_lines
 
@@ -395,11 +400,9 @@ class MainGame:
 
             self.w.blit(table, (650, 50))
 
-
-        #if self.mode:
-            #for spawn in spawns:
-                #spawns_rects.append(([size * randint(0, game_lines - 1)]))
-
+        # if self.mode:
+        #     for spawn in spawns:
+        #         spawns_rects.append(([size * randint(0, game_lines - 1)]))
 
         button_pause = Button((660, 10, 30, 30), "", None, image="data/images/pause.png",
                               function=self.fill_alpha)
@@ -436,9 +439,17 @@ class MainGame:
             [255 - 255 * is_light] * 3, fsize=50
         )
 
+        label_name = Label(
+            (475, 350),
+            level_name,
+            [255 - 255 * is_light] * 3, fsize=40
+        )
+
         image_level = pygame.image.load(icon)
         image_level = pygame.transform.scale(image_level,
                                              customize_sizes((300, 200), (image_level.get_size())))
+
+        image_star = pygame.transform.scale(pygame.image.load("data/images/star.png"), (40, 40))
 
         on_menu = False
 
@@ -449,6 +460,8 @@ class MainGame:
         particles = effects["particle"]
         petals = effects["petal"]
         sparks = effects["spark"]
+
+        complexity = level["complexity"]
 
         pygame.mixer.music.load(music)
         pygame.mixer.music.play(1)
@@ -468,17 +481,19 @@ class MainGame:
         time = 0
 
         letters = [
-            Label([x * size + size / 2, 463], "QWERTY"[x], fsize=60,
+            Label([x * size + size / 2, 463], "QWERTYUIOP"[x], fsize=60,
                   text_color=([255] * 3 if is_light else [0] * 3))
             for x in range(game_lines)
         ]
 
         letters_rects = [
-            [letters_colors[x] if letters_colors else
+            [letters_colors[x % len(letters_colors)] if letters_colors else
                 ([204] * 3 if not is_light else [41] * 3),
              [round(x * size), 425, round(size), 75]]
             for x in range(game_lines)
         ]
+
+
 
         while True:
             self.w.fill(back_color)
@@ -535,12 +550,20 @@ class MainGame:
 
                 switch_volume.draw(self.w)
                 label_volume.draw(self.w)
+                label_name.draw(self.w)
 
                 self.set_cursor(max([0] + [obj.id for obj in [
-                    button_pause, switch_volume, button_play_again, button_quit_menu, label_volume, button_quit_level
+                    button_pause, switch_volume, button_play_again, button_quit_menu, label_volume, button_quit_level,
+                    label_name
                 ] if obj.collide_point((self.x, self.y))]))
 
                 self.w.blit(image_level, (475 - image_level.get_width() // 2, 225 - image_level.get_height() // 2))
+
+                x1 = 465 - (35 * (complexity - 1))
+
+                for _ in range(complexity):
+                    self.w.blit(image_star, (x1, 370))
+                    x1 += 65
             else:
                 [pygame.draw.rect(self.w, *rect) for rect in letters_rects]
 
@@ -604,7 +627,7 @@ class MainGame:
         self.w.blit(s, (0, 0))
 
     def fill_alpha(self, color: tuple[int, int, int] = (0, 0, 0)):
-        self.fill(color, 128)
+        self.fill(color, 92)
 
     def set_cursor(self, a: bool | int):
         if a == 1:
