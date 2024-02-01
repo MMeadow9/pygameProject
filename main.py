@@ -14,6 +14,8 @@ from data.effects.particle import *
 from data.documentation.guide.guide_en import *
 from data.documentation.guide.guide_ru import *
 
+from data.game_rect import *
+
 import webbrowser
 
 
@@ -29,7 +31,7 @@ clock = pygame.time.Clock()
 FPS = 40
 
 
-def customize_sizes(size1: tuple[int] | list[int], size2: tuple[int] | list[int]) -> tuple[int]:
+def customize_sizes(size1: tuple[int] | list[int], size2: tuple[int] | list[int]) -> tuple[int, int]:
     x1, y1 = size1
     x2, y2 = size2
     z = min([x1 / x2, y1 / y2])
@@ -366,12 +368,9 @@ class MainGame:
 
         comp = level["complexity"]
 
-        #spawns = level["spawn_notes"]
+        spawns = level["spawn_notes"]
 
         is_light = level["is_light"]
-
-        if self.mode:
-            spawns = 0
 
         spawns_rects = []
 
@@ -380,6 +379,8 @@ class MainGame:
         game_lines = dct_lines[comp]
 
         size = 650 / game_lines
+
+        pressed_letters = []
 
 
         def draw_stat():
@@ -400,9 +401,13 @@ class MainGame:
 
             self.w.blit(table, (650, 50))
 
-        # if self.mode:
-        #     for spawn in spawns:
-        #         spawns_rects.append(([size * randint(0, game_lines - 1)]))
+        if self.mode:
+            for spawn in spawns:
+                spawns_rects.append(["QWERTYUIOP"[randint(0, game_lines - 1)], int(spawn) + 30])
+        else:
+            spawns_rects = [[values, int(key) + 30] for key, values in spawns.items()]  # 1.5 sec
+
+        spawns_rects = sorted(spawns_rects, key=lambda x: x[1])
 
         button_pause = Button((660, 10, 30, 30), "", None, image="data/images/pause.png",
                               function=self.fill_alpha)
@@ -469,9 +474,13 @@ class MainGame:
 
         letters_colors = level["letter_colors"]
 
+        game_rects_colors = level["game_rects_colors"]
+
         good_res, all_res = 0, 0
 
         ewait = float(effects["wait"]) * 40  # effect wait
+
+        game_rects = []
 
         lines = [
             [(x + 1) * (650 / game_lines), 0, 1,
@@ -493,9 +502,16 @@ class MainGame:
             for x in range(game_lines)
         ]
 
-
+        """
+        
+        spawns_rects    →   list[*list[str, int]]   →   Список с данными для игровых прямоугольников
+        
+        """
 
         while True:
+
+            pressed_letters.clear()
+
             self.w.fill(back_color)
 
             for e in pygame.event.get():
@@ -518,6 +534,28 @@ class MainGame:
 
                 if e.type == pygame.MOUSEMOTION:
                     self.x, self.y = e.pos
+
+                if e.type == pygame.KEYDOWN:
+                    if e.key == pygame.K_q:
+                        pressed_letters.append("Q")
+                    if e.key == pygame.K_w:
+                        pressed_letters.append("W")
+                    if e.key == pygame.K_e:
+                        pressed_letters.append("E")
+                    if e.key == pygame.K_r:
+                        pressed_letters.append("R")
+                    if e.key == pygame.K_t:
+                        pressed_letters.append("T")
+                    if e.key == pygame.K_y:
+                        pressed_letters.append("Y")
+                    if e.key == pygame.K_u:
+                        pressed_letters.append("U")
+                    if e.key == pygame.K_i:
+                        pressed_letters.append("I")
+                    if e.key == pygame.K_o:
+                        pressed_letters.append("O")
+                    if e.key == pygame.K_p:
+                        pressed_letters.append("P")
 
             self.w.blit(
                 pygame.transform.scale(pygame.image.load(back_image), (700, 500))
@@ -565,9 +603,6 @@ class MainGame:
                     self.w.blit(image_star, (x1, 370))
                     x1 += 65
             else:
-                [pygame.draw.rect(self.w, *rect) for rect in letters_rects]
-
-                [label.draw(self.w) for label in letters]
 
                 pygame.draw.rect(self.w, back_color, (650, 0, 50, 50))
 
@@ -599,6 +634,43 @@ class MainGame:
                         Spark(self.all_sprites, (x, y))
 
                     time -= 1
+
+                for rect in spawns_rects:
+                    if iters_of_game == rect[1]:
+                        col = {
+                            "Q": 0, "W": 1, "E": 2, "R": 3, "T": 4, "Y": 5, "U": 6, "I": 7, "O": 8, "P": 9
+                        }[rect[0]]
+
+                        color_data = game_rects_colors[col % len(game_rects_colors)]
+
+                        print(color_data)
+
+                        color = color_data[0]
+
+                        spanel = color_data[1]  # stroke panel
+
+                        gr = GameRect(color, [round(obj) for obj in (col * size, -45, size, 45)], spanel)
+
+                        gr.l = rect[0]
+
+                        game_rects.append(
+                            gr
+                        )
+
+                        self.fill_alpha()
+
+                for game_rect in game_rects[::-1]:
+                    game_rect.move(0, 425 / 60)
+
+                    if game_rect.rect.y >= 500:
+                        game_rects.remove(game_rect)
+
+                for game_rect in game_rects:
+                    game_rect.draw(self.w)
+
+                [pygame.draw.rect(self.w, *rect) for rect in letters_rects]
+
+                [label.draw(self.w) for label in letters]
 
                 self.all_sprites.update()
 
