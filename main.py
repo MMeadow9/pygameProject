@@ -374,6 +374,8 @@ class MainGame:
 
         spawns_rects = []
 
+        duration = level_data["duration"]
+
         dct_lines = {1: 3, 2: 4, 3: 6, 4: 8, 5: 10}
 
         game_lines = dct_lines[comp]
@@ -404,6 +406,8 @@ class MainGame:
 
         ewait = float(effects["wait"]) * 40  # effect wait
 
+        can_to_exit = False
+
         def get_neat():  # Получение коэффициента аккуратности
             try:
                 neat = good_res / all_res
@@ -428,9 +432,9 @@ class MainGame:
 
         if self.mode:
             for spawn in spawns:
-                spawns_rects.append(["QWERTYUIOP"[randint(0, game_lines - 1)], int(spawn) + 30 + 40 * wait])
+                spawns_rects.append(["QWERTYUIOP"[randint(0, game_lines - 1)], int(spawn) + -60 + 40 * wait])
         else:
-            spawns_rects = [[values, int(key) + 30 + 40 * wait] for key, values in spawns.items()]  # 1.5 sec
+            spawns_rects = [[values, int(key) - 60 + 40 * wait] for key, values in spawns.items()]  # 1.5 sec
 
 
         spawns_rects = sorted(spawns_rects, key=lambda x: x[1])
@@ -481,6 +485,18 @@ class MainGame:
             {0: f"Точность: 100%", 1: f"Accuracy: 100%"}[self.language],
             [255 - 255 * is_light] * 3, fsize=45
         )
+
+        label_accu_res = Label(
+            (350, 250),
+            {0: f"Точность: 100%", 1: f"Accuracy: 100%"}[self.language],
+            [255 - 255 * is_light] * 3, fsize=75
+        )
+
+        label_exit = Label(
+            (350, 300),
+            {0: "Для выхода в меню нажмите на любую клавишу", 1: "To access the menu, press any key"}[self.language],
+            [255 - 255 * is_light] * 3, fsize=25
+            )
 
         image_level = pygame.image.load(icon)
         image_level = pygame.transform.scale(image_level,
@@ -551,6 +567,9 @@ class MainGame:
                     self.x, self.y = e.pos
 
                 if e.type == pygame.KEYDOWN:
+                    if can_to_exit:
+                        self.to_select_level()
+
                     if e.key == pygame.K_q:
                         pressed_letters.append("Q")
                     if e.key == pygame.K_w:
@@ -731,6 +750,19 @@ class MainGame:
                 self.set_cursor(any([button.collide_point((self.x, self.y)) for button in [
                     button_pause
                 ]]))
+
+                if (duration + wait + 1) * 40 <= iters_of_game:
+                    self.fill_alpha()
+                    label_accu_res.set_text(
+                        {0: f"Точность: {neat}%", 1: f"Accuracy: {neat}%"}[self.language]
+                    )
+                    label_accu_res.draw(self.w)
+                    label_exit.draw(self.w)
+
+                    can_to_exit = True
+
+                if (duration + wait + 60) * 40 <= iters_of_game:
+                    self.to_select_level()
 
             pygame.display.update()
             clock.tick(FPS)
