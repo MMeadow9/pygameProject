@@ -74,7 +74,7 @@ class MainGame:
 
         self.all_sprites = pygame.sprite.Group()
 
-        self.volume = 0
+        self.volume = 1
 
         self.to_menu()
 
@@ -382,30 +382,56 @@ class MainGame:
 
         pressed_letters = []
 
+        wait = level["wait"]
+
+        effects = level["effects"]
+
+        particles = effects["particle"]
+        petals = effects["petal"]
+        sparks = effects["spark"]
+
+        complexity = level["complexity"]
+
+        pygame.mixer.music.load(music)
+        pygame.mixer.music.play(1)
+        pygame.mixer.music.set_volume(self.volume * 0.2)
+
+        letters_colors = level["letter_colors"]
+
+        game_rects_colors = level["game_rects_colors"]
+
+        good_res, all_res = 0, 0
+
+        ewait = float(effects["wait"]) * 40  # effect wait
+
+        def get_neat():  # Получение коэффициента аккуратности
+            try:
+                neat = good_res / all_res
+            except ZeroDivisionError:
+                neat = 1
+            return neat
 
         def draw_stat():
-            table = pygame.surface.Surface((50, 500))
+            table = pygame.surface.Surface((50, 450))
             table.fill([(not is_light) * 255] * 3)
 
             statistic = pygame.surface.Surface((40, 440))
             statistic.fill((0, 255, 0))
 
-            try:
-                bad_line = int(490 * (good_res / all_res))
-            except ZeroDivisionError:
-                bad_line = 0
-
-            table.blit(statistic, (5, 5))
+            bad_line = 450 - int(450 * get_neat())
 
             pygame.draw.rect(statistic, (255, 0, 0), (0, 0, 40, bad_line))
+
+            table.blit(statistic, (5, 5))
 
             self.w.blit(table, (650, 50))
 
         if self.mode:
             for spawn in spawns:
-                spawns_rects.append(["QWERTYUIOP"[randint(0, game_lines - 1)], int(spawn) + 30])
+                spawns_rects.append(["QWERTYUIOP"[randint(0, game_lines - 1)], int(spawn) + 30 + 40 * wait])
         else:
-            spawns_rects = [[values, int(key) + 30] for key, values in spawns.items()]  # 1.5 sec
+            spawns_rects = [[values, int(key) + 30 + 40 * wait] for key, values in spawns.items()]  # 1.5 sec
+
 
         spawns_rects = sorted(spawns_rects, key=lambda x: x[1])
 
@@ -450,6 +476,12 @@ class MainGame:
             [255 - 255 * is_light] * 3, fsize=40
         )
 
+        label_accu = Label(
+            (475, 450),
+            {0: f"Точность: 100%", 1: f"Accuracy: 100%"}[self.language],
+            [255 - 255 * is_light] * 3, fsize=45
+        )
+
         image_level = pygame.image.load(icon)
         image_level = pygame.transform.scale(image_level,
                                              customize_sizes((300, 200), (image_level.get_size())))
@@ -457,28 +489,6 @@ class MainGame:
         image_star = pygame.transform.scale(pygame.image.load("data/images/star.png"), (40, 40))
 
         on_menu = False
-
-        wait = level["wait"]
-
-        effects = level["effects"]
-
-        particles = effects["particle"]
-        petals = effects["petal"]
-        sparks = effects["spark"]
-
-        complexity = level["complexity"]
-
-        pygame.mixer.music.load(music)
-        pygame.mixer.music.play(1)
-        pygame.mixer.music.set_volume(self.volume * 0.2)
-
-        letters_colors = level["letter_colors"]
-
-        game_rects_colors = level["game_rects_colors"]
-
-        good_res, all_res = 0, 0
-
-        ewait = float(effects["wait"]) * 40  # effect wait
 
         game_rects = []
 
@@ -498,9 +508,14 @@ class MainGame:
         letters_rects = [
             [letters_colors[x % len(letters_colors)] if letters_colors else
                 ([204] * 3 if not is_light else [41] * 3),
-             [round(x * size), 425, round(size), 75]]
+             pygame.rect.Rect([round(x * size), 425, round(size), 75])]
             for x in range(game_lines)
         ]
+
+        letters_dct = {
+            "QWERTYUIOP"[i]: letters_rects[i][1]
+            for i in range(game_lines)
+        }
 
         """
         
@@ -565,9 +580,16 @@ class MainGame:
             [pygame.draw.ellipse(self.w, *ellips) for ellips in ellipses[::-1]]
 
             self.all_sprites.draw(self.w)
+
             draw_stat()
 
+            neat = int(get_neat() * 100) if not (get_neat() * 100) % 1 else round(get_neat() * 100, 1)
+
             if on_menu:
+                label_accu.set_text(
+                    {0: f"Точность: {neat}%", 1: f"Accuracy: {neat}%"}[self.language]
+                )
+
                 [pygame.draw.rect(self.w, *rect) for rect in letters_rects]
 
                 [label.draw(self.w) for label in letters]
@@ -579,8 +601,10 @@ class MainGame:
                 self.fill_alpha()
                 pygame.mixer.music.pause()
 
-                [button.check_on((self.x, self.y)) for button in [button_quit_level, button_quit_menu, button_play_again]]
-                [button.draw(self.w) for button in [button_quit_level, button_quit_menu, button_play_again, button_pause]]
+                [button.check_on((self.x, self.y)) for button in [button_quit_level, button_quit_menu,
+                                                                  button_play_again]]
+                [button.draw(self.w) for button in [button_quit_level, button_quit_menu, button_play_again,
+                                                    button_pause, label_accu]]
 
                 self.volume = switch_volume.get_selected()
 
@@ -592,7 +616,7 @@ class MainGame:
 
                 self.set_cursor(max([0] + [obj.id for obj in [
                     button_pause, switch_volume, button_play_again, button_quit_menu, label_volume, button_quit_level,
-                    label_name
+                    label_name, label_accu
                 ] if obj.collide_point((self.x, self.y))]))
 
                 self.w.blit(image_level, (475 - image_level.get_width() // 2, 225 - image_level.get_height() // 2))
@@ -643,8 +667,6 @@ class MainGame:
 
                         color_data = game_rects_colors[col % len(game_rects_colors)]
 
-                        print(color_data)
-
                         color = color_data[0]
 
                         spanel = color_data[1]  # stroke panel
@@ -657,13 +679,35 @@ class MainGame:
                             gr
                         )
 
-                        self.fill_alpha()
+                del_rects = []
 
-                for game_rect in game_rects[::-1]:
+                for game_rect in game_rects:
                     game_rect.move(0, 425 / 60)
 
                     if game_rect.rect.y >= 500:
-                        game_rects.remove(game_rect)
+                        del_rects.append(game_rect)
+                        all_res += 1
+
+                    for let in pressed_letters[::-1]:
+                        if let in "QWERTYUIOP"[
+                            :{1: 3, 2: 4, 3: 6, 4: 8, 5: 10}[complexity]
+                        ]:
+                            rect = letters_dct[let]
+
+                            if game_rect.l == let:
+
+                                pressed_letters.remove(let)
+
+                                if rect.colliderect(game_rect):
+                                    del_rects.append(game_rect)
+                                    all_res += 1
+                                    good_res += 1
+                                else:
+                                    all_res += 1
+
+                [game_rects.remove(rect) for rect in del_rects]
+
+                all_res += len(pressed_letters)
 
                 for game_rect in game_rects:
                     game_rect.draw(self.w)

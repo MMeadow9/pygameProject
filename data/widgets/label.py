@@ -36,3 +36,6 @@ class Label:
         rect.y = self.center[1] - rect.height // 2
 
         return rect.collidepoint(*pos)
+
+    def set_text(self, text: str):
+        self.text = text
