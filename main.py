@@ -30,6 +30,13 @@ clock = pygame.time.Clock()
 
 FPS = 40
 
+RED, R_ORANGE, ORANGE, Y_ORANGE, YELLOW, LIME, GREEN, SEA, CYAN, BLUE, PURPLE, PINK = (
+    (255, 0, 0), (255, 64, 0), (255, 128, 0), (255, 192, 0), (255, 255, 0), (128, 255, 0),
+    (0, 255, 0), (0, 255, 128), (0, 255, 255), (0, 0, 255), (192, 0, 255), (255, 0, 192)
+)
+
+
+
 
 def customize_sizes(size1: tuple[int] | list[int], size2: tuple[int] | list[int]) -> tuple[int, int]:
     x1, y1 = size1
@@ -275,28 +282,31 @@ class MainGame:
                              rounding=9,
                              is_italic=True,
                              function=self.play)
+        try:
+            image_star = pygame.transform.scale(pygame.image.load("data/images/star.png"), (40, 40))
 
+            image_level_path = levels_json[f"level{self.levelID + 1}"]["icon"]
 
+            image_level = pygame.image.load(image_level_path)
 
-        image_star = pygame.transform.scale(pygame.image.load("data/images/star.png"), (40, 40))
+            image_level = pygame.transform.scale(image_level,
+                                                customize_sizes((300, 200), (image_level.get_size())))
 
-        image_level_path = levels_json[f"level{self.levelID + 1}"]["icon"]
-        image_level = pygame.image.load(image_level_path)
-        image_level = pygame.transform.scale(image_level,
-                                            customize_sizes((300, 200), (image_level.get_size())))
+            label_name = Label((505, 40),
+                               levels_json[f"level{self.levelID + 1}"]["data"]["name"][str(self.language)],
+                               text_color=(255, 255, 255),
+                               fsize={0: 50, 1: 41}[self.language])
 
-        label_name = Label((505, 40),
-                           levels_json[f"level{self.levelID + 1}"]["data"]["name"][str(self.language)],
-                           text_color=(255, 255, 255),
-                           fsize={0: 50, 1: 41}[self.language])
+            label_duration = Label((505, 90),
+                    {0: f"Продолжительность: {levels_json['level' + str(self.levelID + 1)]['data']['duration']} сек.",
+                     1: f"Duration: {levels_json['level' + str(self.levelID + 1)]['data']['duration']} sec."}[self.language],
+                                   (255, 255, 255),
+                                   fsize=31)
 
-        label_duration = Label((505, 90),
-                {0: f"Продолжительность: {levels_json['level' + str(self.levelID + 1)]['data']['duration']} сек.",
-                 1: f"Duration: {levels_json['level' + str(self.levelID + 1)]['data']['duration']} sec."}[self.language],
-                               (255, 255, 255),
-                               fsize=31)
-
-        complexity = levels_json[f"level{self.levelID + 1}"]["complexity"]
+            complexity = levels_json[f"level{self.levelID + 1}"]["complexity"]
+        except Exception as error:
+            print(f"Ошибка при получении данных из LEVELS.JSON, ошибка {error}.\n")
+            self.to_menu()
 
         while True:
             self.w.fill((0, 0, 0))
@@ -351,62 +361,68 @@ class MainGame:
 
         self.music_is_already_played = 0
 
-        level = levels_json[f"level{self.levelID + 1}"]
+        try:
+            level = levels_json[f"level{self.levelID + 1}"]
 
-        level_data = level["data"]
-        level_name = level_data["name"][str(self.language)]
+            level_data = level["data"]
+            level_name = level_data["name"][str(self.language)]
 
-        music = level["music"]
-        icon = level["icon"]
-        back_image = level["background_image"]
-        back_color = level["background_color"]
+            music = level["music"]
+            icon = level["icon"]
+            back_image = level["background_image"]
+            back_color = level["background_color"]
 
-        rects = level["figures"]["rects"]
-        ellipses = level["figures"]["ellipses"]
+            rects = level["figures"]["rects"]
+            ellipses = level["figures"]["ellipses"]
 
-        iters_of_game = 0
+            iters_of_game = 0
 
-        comp = level["complexity"]
+            comp = level["complexity"]
 
-        spawns = level["spawn_notes"]
+            spawns = level["spawn_notes"]
 
-        is_light = level["is_light"]
+            is_light = level["is_light"]
 
-        spawns_rects = []
+            spawns_rects = []
 
-        duration = level_data["duration"]
+            duration = level_data["duration"]
 
-        dct_lines = {1: 3, 2: 4, 3: 6, 4: 8, 5: 10}
+            dct_lines = {1: 3, 2: 4, 3: 6, 4: 8, 5: 10}
 
-        game_lines = dct_lines[comp]
+            game_lines = dct_lines[comp]
 
-        size = 650 / game_lines
+            size = 650 / game_lines
 
-        pressed_letters = []
+            pressed_letters = []
 
-        wait = level["wait"]
+            wait = level["wait"]
 
-        effects = level["effects"]
+            effects = level["effects"]
 
-        particles = effects["particle"]
-        petals = effects["petal"]
-        sparks = effects["spark"]
+            particles = effects["particle"]
+            petals = effects["petal"]
+            sparks = effects["spark"]
 
-        complexity = level["complexity"]
+            complexity = level["complexity"]
 
-        pygame.mixer.music.load(music)
-        pygame.mixer.music.play(1)
-        pygame.mixer.music.set_volume(self.volume * 0.2)
+            pygame.mixer.music.load(music)
+            pygame.mixer.music.play(1)
+            pygame.mixer.music.set_volume(self.volume * 0.2)
 
-        letters_colors = level["letter_colors"]
+            letters_colors = level["letter_colors"]
 
-        game_rects_colors = level["game_rects_colors"]
+            game_rects_colors = level["game_rects_colors"]
 
-        good_res, all_res = 0, 0
+            good_res, all_res = 0, 0
 
-        ewait = float(effects["wait"]) * 40  # effect wait
+            ewait = float(effects["wait"]) * 40  # effect wait
 
-        can_to_exit = False
+            can_to_exit = False
+
+            rect_size = level["rect_size"]
+        except Exception as error:
+            print(f"Ошибка при получении данных из LEVELS.JSON, ошибка {error}.\n")
+            self.to_select_level()
 
         def get_neat():  # Получение коэффициента аккуратности
             try:
@@ -489,13 +505,13 @@ class MainGame:
         label_accu_res = Label(
             (350, 250),
             {0: f"Точность: 100%", 1: f"Accuracy: 100%"}[self.language],
-            [255 - 255 * is_light] * 3, fsize=75
+            [255 - 255 * is_light] * 3, fsize=95
         )
 
         label_exit = Label(
             (350, 300),
             {0: "Для выхода в меню нажмите на любую клавишу", 1: "To access the menu, press any key"}[self.language],
-            [255 - 255 * is_light] * 3, fsize=25
+            [255 - 255 * is_light] * 3, fsize=30
             )
 
         image_level = pygame.image.load(icon)
@@ -549,6 +565,8 @@ class MainGame:
                 if e.type == pygame.QUIT:
                     exit()
                 if e.type == pygame.MOUSEBUTTONDOWN:
+                    if can_to_exit:
+                        self.to_select_level()
 
                     if button_pause.collide_point(e.pos):
                         on_menu = bool(on_menu - 1)
@@ -602,7 +620,7 @@ class MainGame:
 
             draw_stat()
 
-            neat = int(get_neat() * 100) if not (get_neat() * 100) % 1 else round(get_neat() * 100, 1)
+            neat = int(get_neat() * 100) if not (get_neat() * 100) % 1 else round(get_neat() * 100, 2)
 
             if on_menu:
                 label_accu.set_text(
@@ -690,7 +708,7 @@ class MainGame:
 
                         spanel = color_data[1]  # stroke panel
 
-                        gr = GameRect(color, [round(obj) for obj in (col * size, -45, size, 45)], spanel)
+                        gr = GameRect(color, [round(obj) for obj in (col * size, -rect_size, size, rect_size)], spanel)
 
                         gr.l = rect[0]
 
@@ -756,6 +774,19 @@ class MainGame:
                     label_accu_res.set_text(
                         {0: f"Точность: {neat}%", 1: f"Accuracy: {neat}%"}[self.language]
                     )
+                    label_accu.text_color = {
+                        0: RED,
+                        10: RED,
+                        20: R_ORANGE,
+                        30: ORANGE,
+                        40: ORANGE,
+                        50: Y_ORANGE,
+                        60: YELLOW,
+                        70: YELLOW,
+                        80: LIME,
+                        90: GREEN,
+                        100: GREEN
+                                }[round(neat, -1)]
                     label_accu_res.draw(self.w)
                     label_exit.draw(self.w)
 

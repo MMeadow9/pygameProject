@@ -48,7 +48,8 @@
       ],
       "spark": null,
       "wait": "0.005"
-    }
+    },
+    "rect_size": 50
   },
 
   "level2": {
@@ -94,7 +95,8 @@
       "petal": null,
       "spark": null,
       "wait": "0.025"
-      }
+      },
+    "rect_size": 45
   },
 
   "level3": {
@@ -155,7 +157,8 @@
     "petal": null,
     "spark": null,
     "wait": "0.055"
-    }
+    },
+  "rect_size": 45
 
   }
 
