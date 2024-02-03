@@ -11,9 +11,6 @@ from data.effects.petal import *
 from data.effects.spark import *
 from data.effects.particle import *
 
-from data.documentation.guide.guide_en import *
-from data.documentation.guide.guide_ru import *
-
 from other.game_rect import *
 from other import arcanoid as arc
 
@@ -91,22 +88,18 @@ class MainGame:
 
             self.music_is_already_played = 1
 
-        button_play = Button((100, 25, 500, 90),
+        button_play = Button((70, 35, 560, 110),
                              {0: "Играть", 1: "Play"}[self.language],
-                             is_bold=True, is_italic=True, fsize=80, rounding=17, function=self.to_select_level)
+                             is_bold=True, is_italic=True, fsize=100, rounding=17, function=self.to_select_level)
 
-        button_settings = Button((100, 140, 500, 90),
+        button_settings = Button((70, 195, 560, 110),
                                  {0: "Настройки", 1: "Settings"}[self.language],
-                                 fsize=80, rounding=17, is_italic=True,
+                                 fsize=100, rounding=17, is_italic=True,
                                  function=self.to_settings)
 
-        button_guide = Button((100, 260, 500, 90),
-                              {0: "Гайд", 1: "Guide"}[self.language],
-                              fsize=80, rounding=16, is_italic=True, function=self.guide)
-
-        button_play_arc = Button((100, 380, 500, 90),
+        button_play_arc = Button((70, 355, 560, 110),
             {0: "Сыграть в Арканоид", 1: "Play in Arcanoid"}[self.language],
-            rounding=16, fsize=60, function=self.play_arc, is_italic=True
+            rounding=16, fsize={0: 75, 1: 85}[self.language], function=self.play_arc, is_italic=True
         )
 
         while True:
@@ -118,19 +111,19 @@ class MainGame:
                     exit()
                 if e.type == pygame.MOUSEBUTTONDOWN:
                     [button.check_click(e.pos)
-                        for button in [button_play, button_settings, button_guide, button_play_arc]]
+                        for button in [button_play, button_settings, button_play_arc]]
 
                 if e.type == pygame.MOUSEMOTION:
                     self.x, self.y = e.pos
 
             [button.check_on((self.x, self.y))
-                for button in [button_play, button_settings, button_guide, button_play_arc]]
+                for button in [button_play, button_settings, button_play_arc]]
 
             [button.draw(self.w)
-                for button in [button_play, button_settings, button_guide, button_play_arc]]
+                for button in [button_play, button_settings, button_play_arc]]
 
             self.set_cursor(any([button.collide_point((self.x, self.y)) for button in [
-                button_play, button_settings, button_guide, button_play_arc
+                button_play, button_settings, button_play_arc
             ]]))
 
             pygame.display.update()
@@ -236,15 +229,6 @@ class MainGame:
 
             pygame.display.update()
             clock.tick(FPS)
-
-    def guide(self):
-        app = QApplication([])
-        if self.language:
-            guide = GuideEn()
-        else:
-            guide = GuideRu()
-        guide.show()
-        app.exec()
 
     def to_select_level(self):
         if not self.music_is_already_played:
