@@ -1,4 +1,4 @@
-from random import randint, choice, choices
+from random import randint, choice
 import pygame
 import json
 
@@ -14,10 +14,10 @@ from data.effects.particle import *
 from data.documentation.guide.guide_en import *
 from data.documentation.guide.guide_ru import *
 
-from data.game_rect import *
+from other.game_rect import *
+from other import arcanoid as arc
 
 import webbrowser
-
 
 pygame.init()
 
@@ -34,8 +34,6 @@ RED, R_ORANGE, ORANGE, Y_ORANGE, YELLOW, LIME, GREEN, SEA, CYAN, BLUE, PURPLE, P
     (255, 0, 0), (255, 64, 0), (255, 128, 0), (255, 192, 0), (255, 255, 0), (128, 255, 0),
     (0, 255, 0), (0, 255, 128), (0, 255, 255), (0, 0, 255), (192, 0, 255), (255, 0, 192)
 )
-
-
 
 
 def customize_sizes(size1: tuple[int] | list[int], size2: tuple[int] | list[int]) -> tuple[int, int]:
@@ -60,7 +58,6 @@ def get_obj(obj: str | int | None) -> str | int | None:
         result = obj  # Если это не строка (значит число), то просто сохраняем это в переменную
 
     return result  # Возвращаем объект
-
 
 
 class MainGame:
@@ -94,18 +91,23 @@ class MainGame:
 
             self.music_is_already_played = 1
 
-        button_play = Button((230, 280, 240, 100),
+        button_play = Button((100, 25, 500, 90),
                              {0: "Играть", 1: "Play"}[self.language],
-                             is_bold=True, is_italic=True, fsize=90, rounding=7, function=self.to_select_level)
+                             is_bold=True, is_italic=True, fsize=80, rounding=17, function=self.to_select_level)
 
-        button_settings = Button((400, 20, 280, 80),
+        button_settings = Button((100, 140, 500, 90),
                                  {0: "Настройки", 1: "Settings"}[self.language],
-                                 fsize=55, rounding=7, is_italic=True,
+                                 fsize=80, rounding=17, is_italic=True,
                                  function=self.to_settings)
 
-        button_guide = Button((20, 20, 280, 80),
+        button_guide = Button((100, 260, 500, 90),
                               {0: "Гайд", 1: "Guide"}[self.language],
-                              fsize=75, rounding=6, is_italic=True, function=self.guide)
+                              fsize=80, rounding=16, is_italic=True, function=self.guide)
+
+        button_play_arc = Button((100, 380, 500, 90),
+            {0: "Сыграть в Арканоид", 1: "Play in Arcanoid"}[self.language],
+            rounding=16, fsize=60, function=self.play_arc, is_italic=True
+        )
 
         while True:
             self.all_sprites = pygame.sprite.Group()
@@ -116,17 +118,19 @@ class MainGame:
                     exit()
                 if e.type == pygame.MOUSEBUTTONDOWN:
                     [button.check_click(e.pos)
-                        for button in [button_play, button_settings, button_guide]]
+                        for button in [button_play, button_settings, button_guide, button_play_arc]]
+
                 if e.type == pygame.MOUSEMOTION:
                     self.x, self.y = e.pos
 
-            [button.check_on((self.x, self.y)) for button in [button_play, button_settings, button_guide]]
+            [button.check_on((self.x, self.y))
+                for button in [button_play, button_settings, button_guide, button_play_arc]]
 
             [button.draw(self.w)
-                for button in [button_play, button_settings, button_guide]]
+                for button in [button_play, button_settings, button_guide, button_play_arc]]
 
             self.set_cursor(any([button.collide_point((self.x, self.y)) for button in [
-                button_play, button_settings, button_guide
+                button_play, button_settings, button_guide, button_play_arc
             ]]))
 
             pygame.display.update()
@@ -503,13 +507,13 @@ class MainGame:
         )
 
         label_accu_res = Label(
-            (350, 250),
+            (325, 250),
             {0: f"Точность: 100%", 1: f"Accuracy: 100%"}[self.language],
             [255 - 255 * is_light] * 3, fsize=95
         )
 
         label_exit = Label(
-            (350, 300),
+            (325, 300),
             {0: "Для выхода в меню нажмите на любую клавишу", 1: "To access the menu, press any key"}[self.language],
             [255 - 255 * is_light] * 3, fsize=30
             )
@@ -815,6 +819,18 @@ class MainGame:
             pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_ARROW))
         elif a == 2:
             pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_IBEAM))
+
+    def play_arc(self):
+        arc.play()
+
+        self.w = pygame.display.set_mode((700, 500))
+
+        pygame.mixer.music.load("data/sounds/back_music.mp3")
+        pygame.mixer.music.play(-1)
+
+        pygame.mixer.music.set_volume(self.volume * 0.2)
+
+        self.music_is_already_played = 1
 
 
 MainGame(window)
