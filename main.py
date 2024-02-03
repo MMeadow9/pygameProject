@@ -12,7 +12,7 @@ from data.effects.spark import *
 from data.effects.particle import *
 
 from other.game_rect import *
-from other import arcanoid as arc
+from other import MB
 
 import webbrowser
 
@@ -97,9 +97,9 @@ class MainGame:
                                  fsize=100, rounding=17, is_italic=True,
                                  function=self.to_settings)
 
-        button_play_arc = Button((70, 355, 560, 110),
-            {0: "Сыграть в Арканоид", 1: "Play in Arcanoid"}[self.language],
-            rounding=16, fsize={0: 75, 1: 85}[self.language], function=self.play_arc, is_italic=True
+        button_play_mb = Button((70, 355, 560, 110),
+            {0: "Сыграть в Магический Шар", 1: "Play in Magic Ball"}[self.language],
+            rounding=16, fsize={0: 55, 1: 75}[self.language], function=self.play_mb, is_italic=True
         )
 
         while True:
@@ -111,19 +111,19 @@ class MainGame:
                     exit()
                 if e.type == pygame.MOUSEBUTTONDOWN:
                     [button.check_click(e.pos)
-                        for button in [button_play, button_settings, button_play_arc]]
+                        for button in [button_play, button_settings, button_play_mb]]
 
                 if e.type == pygame.MOUSEMOTION:
                     self.x, self.y = e.pos
 
             [button.check_on((self.x, self.y))
-                for button in [button_play, button_settings, button_play_arc]]
+                for button in [button_play, button_settings, button_play_mb]]
 
             [button.draw(self.w)
-                for button in [button_play, button_settings, button_play_arc]]
+                for button in [button_play, button_settings, button_play_mb]]
 
             self.set_cursor(any([button.collide_point((self.x, self.y)) for button in [
-                button_play, button_settings, button_play_arc
+                button_play, button_settings, button_play_mb
             ]]))
 
             pygame.display.update()
@@ -488,6 +488,7 @@ class MainGame:
             (475, 450),
             {0: f"Точность: 100%", 1: f"Accuracy: 100%"}[self.language],
             [255 - 255 * is_light] * 3, fsize=45
+
         )
 
         label_accu_res = Label(
@@ -804,8 +805,8 @@ class MainGame:
         elif a == 2:
             pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_IBEAM))
 
-    def play_arc(self):
-        arc.play()
+    def play_mb(self):
+        MB.play("other/")
 
         self.w = pygame.display.set_mode((700, 500))
 

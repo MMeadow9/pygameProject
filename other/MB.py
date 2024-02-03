@@ -1,16 +1,14 @@
-def play():
+def play(path=""):
 
     import pygame
     from random import randint, choice
-
 
     pygame.init()
 
     window = pygame.display.set_mode((1000, 725))
 
-
     class Asteroid1:
-        def __init__(self, filename="other/data/images/asteroid1"):
+        def __init__(self, filename=path + "data/images/asteroid1"):
             size = choice([
                 (59, 49),
                 (42, 36),
@@ -47,9 +45,8 @@ def play():
         def collide_point(self, x, y):
             self.rect.collidepoint(x, y)
 
-
     class Asteroid2(Asteroid1):
-        def __init__(self, filename="other/data/images/asteroid2"):
+        def __init__(self, filename=path + "data/images/asteroid2"):
             super().__init__(filename)
 
         def update(self):
@@ -59,9 +56,8 @@ def play():
                 self.speedx *= -1
                 self.rotate *= -1
 
-
     class Asteroid3(Asteroid1):
-        def __init__(self, filename="other/data/images/asteroid3"):
+        def __init__(self, filename=path + "data/images/asteroid3"):
             super().__init__(filename)
 
             self.os = False  # on_screen
@@ -73,10 +69,11 @@ def play():
                 self.speedy *= -1
                 self.rotate *= -1
 
+            self.os = self.rect.y > 0
 
     class Asteroid4(Asteroid1):
         def __init__(self):
-            super().__init__("other/data/images/asteroid4")
+            super().__init__(path + "data/images/asteroid4")
 
             self.os = False  # on_screen
 
@@ -97,7 +94,7 @@ def play():
 
     class Bolt:
         def __init__(self):
-            self.image = pygame.image.load("other/data/images/magicBolt.png")
+            self.image = pygame.image.load(path + "data/images/magicBolt.png")
             self.rect = pygame.rect.Rect(470, 580, 60, 60)
             self.dx = choice([4, -4])
             self.dy = -4
@@ -127,16 +124,16 @@ def play():
 
     clock = pygame.time.Clock()
     bolt = Bolt()
-    back = pygame.image.load("other/data/images/background.png")
-    plat = pygame.image.load("other/data/images/platform.png")
+    back = pygame.image.load(path + "data/images/background.png")
+    plat = pygame.image.load(path + "data/images/platform.png")
 
-    earth = pygame.image.load("other/data/images/earth.png")
+    earth = pygame.image.load(path + "data/images/earth.png")
 
     move_r, move_l = False, False
     move_a = False
 
     x = 445
-    pygame.mixer.music.load("other/data/sounds/sound.mp3")
+    pygame.mixer.music.load(path + "data/sounds/sound.mp3")
     pygame.mixer.music.play(-1)
 
     while True:
