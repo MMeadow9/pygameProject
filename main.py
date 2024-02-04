@@ -597,6 +597,8 @@ class MainGame:
                         pressed_letters.append("O")
                     if e.key == pygame.K_p:
                         pressed_letters.append("P")
+                    if e.key == pygame.K_SPACE:
+                        on_menu = bool(on_menu - 1)
 
             self.w.blit(
                 pygame.transform.scale(pygame.image.load(back_image), (700, 500))
@@ -612,6 +614,9 @@ class MainGame:
             neat = int(get_neat() * 100) if not (get_neat() * 100) % 1 else round(get_neat() * 100, 2)
 
             if on_menu:
+                for game_rect in game_rects:
+                    game_rect.draw(self.w)
+
                 label_accu.set_text(
                     {0: f"Точность: {neat}%", 1: f"Accuracy: {neat}%"}[self.language]
                 )
