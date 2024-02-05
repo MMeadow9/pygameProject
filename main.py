@@ -37,18 +37,18 @@ def customize_sizes(size1: tuple[int] | list[int], size2: tuple[int] | list[int]
     x1, y1 = size1
     x2, y2 = size2
     z = min([x1 / x2, y1 / y2])
-    return (int(x2 * z), int(y2 * z))
+    return int(x2 * z), int(y2 * z)
 
 
 def get_obj(obj: str | int | None) -> str | int | None:
     result = None  # coordination
 
-    if type(obj) == str:  # Если это строка
+    if isinstance(obj, str):  # Если это строка
         if obj.startswith("choice"):  # Если она начинается с choice
             result = choice(obj.split()[1:])  # Получаем случайный объект из строки
         elif obj.startswith("randint"):  # Если она начинается с randint
-            result = randint(int(obj.split()[1]),
-                        int(obj.split()[2]))  # Получаем случайное число между 1-ым и 2-ым элементами
+            result = randint(int(obj.split()[1]), int(obj.split()[2]))
+            # Получаем случайное число между 1-ым и 2-ым элементами
         else:  # Если не начинается с choice или randint
             result = obj  # Значит нам нужна вся строка
     else:
@@ -97,8 +97,12 @@ class MainGame:
                                  fsize=100, rounding=17, is_italic=True,
                                  function=self.to_settings)
 
-        button_play_mb = Button((70, 355, 560, 110),
-            {0: "Сыграть в Магический Шар", 1: "Play in Magic Ball"}[self.language],
+        button_play_mb = Button(
+            (70, 355, 560, 110),
+            {
+                0: "Сыграть в Магический Шар",
+                1: "Play in Magic Ball"
+            }[self.language],
             rounding=16, fsize={0: 55, 1: 75}[self.language], function=self.play_mb, is_italic=True
         )
 
@@ -111,16 +115,16 @@ class MainGame:
                     exit()
                 if e.type == pygame.MOUSEBUTTONDOWN:
                     [button.check_click(e.pos)
-                        for button in [button_play, button_settings, button_play_mb]]
+                     for button in [button_play, button_settings, button_play_mb]]
 
                 if e.type == pygame.MOUSEMOTION:
                     self.x, self.y = e.pos
 
             [button.check_on((self.x, self.y))
-                for button in [button_play, button_settings, button_play_mb]]
+             for button in [button_play, button_settings, button_play_mb]]
 
             [button.draw(self.w)
-                for button in [button_play, button_settings, button_play_mb]]
+             for button in [button_play, button_settings, button_play_mb]]
 
             self.set_cursor(any([button.collide_point((self.x, self.y)) for button in [
                 button_play, button_settings, button_play_mb
@@ -140,7 +144,7 @@ class MainGame:
 
         switch_volume = BigSwitch(
             (25, 30, 650, 100), [153] * 3,
-            [{0: "Выкл.", 1: "OFF"}[self.language]] + list("12345"),
+                                [{0: "Выкл.", 1: "OFF"}[self.language]] + list("12345"),
             [
                 [35, 40, 140, 80], [175 + 28, 60, 70, 60], [245 + 28 * 2, 60, 70, 60], [315 + 28 * 3, 60, 70, 60],
                 [385 + 28 * 4, 40, 70, 80], [455 + 28 * 5, 40, 70, 80]
@@ -258,7 +262,10 @@ class MainGame:
                              function=self.to_menu,
                              is_italic=True)
 
-        button_open = Button([270, 265, 405, 75], {0: "Открыть URL в Браузере", 1: "Open URL in Browser"}[self.language],
+        button_open = Button([270, 265, 405, 75], {
+            0: "Открыть URL в Браузере",
+            1: "Open URL in Browser"
+        }[self.language],
                              fsize={0: 40, 1: 45}[self.language],
                              function=self.open_level_url,
                              rounding=8,
@@ -278,7 +285,7 @@ class MainGame:
             image_level = pygame.image.load(image_level_path)
 
             image_level = pygame.transform.scale(image_level,
-                                                customize_sizes((300, 200), (image_level.get_size())))
+                                                 customize_sizes((300, 200), (image_level.get_size())))
 
             label_name = Label((505, 40),
                                levels_json[f"level{self.levelID + 1}"]["data"]["name"][str(self.language)],
@@ -286,8 +293,14 @@ class MainGame:
                                fsize={0: 50, 1: 41}[self.language])
 
             label_duration = Label((505, 90),
-                    {0: f"Продолжительность: {levels_json['level' + str(self.levelID + 1)]['data']['duration']} сек.",
-                     1: f"Duration: {levels_json['level' + str(self.levelID + 1)]['data']['duration']} sec."}[self.language],
+                                   {
+                                       0:
+                                           f"""Продолжительность: 
+{levels_json['level' + str(self.levelID + 1)]['data']['duration']} сек.""".replace("\n", ""),
+                                       1:
+                                           f"""Duration: 
+{levels_json['level' + str(self.levelID + 1)]['data']['duration']} sec.""".replace("\n", "")}[
+                                       self.language],
                                    (255, 255, 255),
                                    fsize=31)
 
@@ -440,7 +453,6 @@ class MainGame:
         else:
             spawns_rects = [[values, int(key) - 60 + 40 * wait] for key, values in spawns.items()]  # 1.5 sec
 
-
         spawns_rects = sorted(spawns_rects, key=lambda x: x[1])
 
         button_pause = Button((660, 10, 30, 30), "", None, image="data/images/pause.png",
@@ -501,7 +513,7 @@ class MainGame:
             (325, 300),
             {0: "Для выхода в меню нажмите на любую клавишу", 1: "To access the menu, press any key"}[self.language],
             [255 - 255 * is_light] * 3, fsize=30
-            )
+        )
 
         image_level = pygame.image.load(icon)
         image_level = pygame.transform.scale(image_level,
@@ -514,9 +526,9 @@ class MainGame:
         game_rects = []
 
         lines = [
-            [(x + 1) * (650 / game_lines), 0, 1,
-             500] for x in range(game_lines)
-        ] + [[650, 0, 2, 500]]
+                    [(x + 1) * (650 / game_lines), 0, 1,
+                     500] for x in range(game_lines)
+                ] + [[650, 0, 2, 500]]
 
         time = 0
 
@@ -528,7 +540,7 @@ class MainGame:
 
         letters_rects = [
             [letters_colors[x % len(letters_colors)] if letters_colors else
-                ([204] * 3 if not is_light else [41] * 3),
+             ([204] * 3 if not is_light else [41] * 3),
              pygame.rect.Rect([round(x * size), 425, round(size), 75])]
             for x in range(game_lines)
         ]
@@ -704,7 +716,7 @@ class MainGame:
 
                         gr = GameRect(color, [round(obj) for obj in (col * size, -rect_size, size, rect_size)], spanel)
 
-                        gr.l = rect[0]
+                        gr.lt = rect[0]
 
                         game_rects.append(
                             gr
@@ -721,11 +733,11 @@ class MainGame:
 
                     for let in pressed_letters[::-1]:
                         if let in "QWERTYUIOP"[
-                            :{1: 3, 2: 4, 3: 6, 4: 8, 5: 10}[complexity]
-                        ]:
+                                  :{1: 3, 2: 4, 3: 6, 4: 8, 5: 10}[complexity]
+                                  ]:
                             rect = letters_dct[let]
 
-                            if game_rect.l == let:
+                            if game_rect.lt == let:
 
                                 pressed_letters.remove(let)
 
@@ -780,7 +792,7 @@ class MainGame:
                         80: LIME,
                         90: GREEN,
                         100: GREEN
-                                }[round(neat, -1)]
+                    }[round(neat, -1)]
                     label_accu_res.draw(self.w)
                     label_exit.draw(self.w)
 
